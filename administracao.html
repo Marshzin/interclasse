@@ -9,562 +9,108 @@
   <link rel="stylesheet" href="css/templatemo-crypto-pages.css">
 
   <style>
-    .sidebar .logo-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 18px;
+    .sidebar .logo-icon { display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; }
+    .custom-active-link { background: linear-gradient(135deg, #b87333, #d49457); color:#fff; }
+    .admin-nav { display:flex; flex-wrap:wrap; gap:12px; margin:18px 0 24px; }
+    .admin-tab-btn { border:1px solid rgba(184,115,51,0.35); background:rgba(184,115,51,0.14); color:#f2c18d; padding:12px 18px; border-radius:14px; font-weight:700; cursor:pointer; transition:0.25s ease; }
+    .admin-tab-btn:hover { background:rgba(184,115,51,0.24); }
+    .admin-tab-btn.active { background:linear-gradient(135deg, #b87333, #d49457); color:#fff; border-color:transparent; }
+    .admin-section { display:none; }
+    .admin-section.active { display:block; }
+    .card { margin-bottom:22px; }
+    .section-title { margin:0 0 8px; color:#fff; font-size:22px; }
+    .section-subtitle { margin:0 0 18px; color:rgba(255,255,255,0.70); line-height:1.6; }
+    .group-title { margin:28px 0 14px; color:#f2c18d; font-size:22px; }
+    .form-grid-custom { display:grid; grid-template-columns:repeat(2, minmax(220px, 1fr)); gap:18px; }
+    .form-group-custom { display:flex; flex-direction:column; gap:8px; }
+    .form-group-custom.full { grid-column:1 / -1; }
+    .form-label-custom { font-size:14px; font-weight:600; color:#fff; }
+    .form-input-custom, .form-textarea-custom, .form-select-custom {
+      width:100%; border:1px solid rgba(255,255,255,0.10); background:rgba(255,255,255,0.04); color:#fff;
+      padding:14px 14px; border-radius:14px; outline:none; font-size:14px; appearance:none; -webkit-appearance:none; box-sizing:border-box;
     }
+    .form-select-custom { color-scheme:dark; }
+    .form-select-custom option, .form-select-custom optgroup { background-color:#2b2b2b; color:#ffffff; }
+    .form-input-custom::placeholder, .form-textarea-custom::placeholder { color:rgba(255,255,255,0.45); }
+    .form-textarea-custom { min-height:140px; resize:vertical; }
+    .btn-row-custom { display:flex; gap:12px; flex-wrap:wrap; margin-top:22px; }
+    .btn-custom { border:none; border-radius:14px; padding:12px 18px; font-size:14px; font-weight:700; cursor:pointer; transition:0.25s ease; }
+    .btn-primary-custom { background:linear-gradient(135deg, #b87333, #d49457); color:#fff; }
+    .btn-primary-custom:hover { transform:translateY(-1px); opacity:0.95; }
+    .btn-secondary-custom { background:rgba(255,255,255,0.06); color:#fff; border:1px solid rgba(255,255,255,0.12); }
+    .btn-danger-custom { background:rgba(220, 53, 69, 0.18); color:#ffb3bc; border:1px solid rgba(220, 53, 69, 0.35); }
+    .btn-warning-custom { background:rgba(255, 193, 7, 0.16); color:#ffd96a; border:1px solid rgba(255, 193, 7, 0.35); }
+    .btn-success-custom { background:rgba(40, 167, 69, 0.18); color:#8df0a6; border:1px solid rgba(40, 167, 69, 0.35); }
+    .players-btn { background:rgba(184,115,51,0.18); color:#f2c18d; border:1px solid rgba(184,115,51,0.35); }
+    .players-btn:hover { background:rgba(184,115,51,0.28); }
+    .teams-grid, .matches-grid { display:grid; grid-template-columns:1fr; gap:18px; margin-top:16px; }
+    .team-box, .match-box, .event-box { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:18px; }
+    .team-box h3, .match-box h3, .event-box h3 { margin:0 0 10px; color:#fff; font-size:20px; }
+    .team-meta, .match-meta, .status-tag { display:inline-block; margin-bottom:14px; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; }
+    .team-meta, .match-meta { background:rgba(184,115,51,0.18); color:#f2c18d; }
+    .status-nao-iniciado { background:rgba(255,255,255,0.10); color:#d9d9d9; }
+    .status-andamento { background:rgba(255, 193, 7, 0.16); color:#ffd96a; }
+    .status-intervalo { background:rgba(90, 160, 255, 0.16); color:#9cc4ff; }
+    .status-finalizado { background:rgba(40, 167, 69, 0.18); color:#8df0a6; }
+    .team-box p, .match-box p, .event-box p { color:rgba(255,255,255,0.82); margin:7px 0; line-height:1.6; }
+    .team-actions, .match-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+    .players-panel, .match-management-panel { display:none; margin-top:14px; padding:14px; border-radius:14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); }
+    .players-panel.show, .match-management-panel.show { display:block; }
+    .players-panel ul { margin:0; padding-left:18px; color:rgba(255,255,255,0.82); line-height:1.7; }
+    .empty-box { background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.15); border-radius:18px; padding:26px; color:rgba(255,255,255,0.65); text-align:center; margin-top:16px; }
+    .score-line { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:12px 0; font-weight:700; color:#fff; }
+    .score-badge { min-width:40px; text-align:center; padding:8px 10px; border-radius:12px; background:rgba(255,255,255,0.07); }
+    .mini-form-grid { display:grid; grid-template-columns:repeat(2, minmax(220px, 1fr)); gap:14px; margin-top:14px; }
+    .event-list { display:grid; gap:12px; margin-top:14px; }
+    .event-tag { display:inline-block; padding:5px 10px; border-radius:999px; font-size:12px; font-weight:700; margin-bottom:8px; }
+    .tag-goal { background:rgba(40, 167, 69, 0.18); color:#8df0a6; }
+    .tag-yellow { background:rgba(255, 193, 7, 0.16); color:#ffd96a; }
+    .tag-red { background:rgba(220, 53, 69, 0.18); color:#ffb3bc; }
+    .help-text { color:rgba(255,255,255,0.6); font-size:13px; line-height:1.5; margin-top:6px; }
+    .login-overlay { position:fixed; inset:0; background:rgba(10, 10, 10, 0.92); display:flex; align-items:center; justify-content:center; z-index:99999; padding:20px; }
+    .login-card { width:100%; max-width:420px; background:#151821; border:1px solid rgba(255,255,255,0.08); border-radius:22px; padding:28px; box-shadow:0 10px 30px rgba(0,0,0,0.35); box-sizing:border-box; }
+    .login-card h2 { margin:0 0 10px; color:#fff; font-size:26px; }
+    .login-card p { margin:0 0 18px; color:rgba(255,255,255,0.68); line-height:1.6; }
+    .login-error { color:#ffb3bc; margin-top:12px; font-size:14px; display:none; }
 
-    .custom-active-link {
-      background: linear-gradient(135deg, #b87333, #d49457);
-      color: #fff;
-    }
-
-    .admin-nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin: 18px 0 24px;
-    }
-
-    .admin-tab-btn {
-      border: 1px solid rgba(184,115,51,0.35);
-      background: rgba(184,115,51,0.14);
-      color: #f2c18d;
-      padding: 12px 18px;
-      border-radius: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.25s ease;
-    }
-
-    .admin-tab-btn:hover {
-      background: rgba(184,115,51,0.24);
-    }
-
-    .admin-tab-btn.active {
-      background: linear-gradient(135deg, #b87333, #d49457);
-      color: #fff;
-      border-color: transparent;
-    }
-
-    .admin-section {
-      display: none;
-    }
-
-    .admin-section.active {
-      display: block;
-    }
-
-    .card {
-      margin-bottom: 22px;
-    }
-
-    .section-title {
-      margin: 0 0 8px;
-      color: #fff;
-      font-size: 22px;
-    }
-
-    .section-subtitle {
-      margin: 0 0 18px;
-      color: rgba(255,255,255,0.70);
-      line-height: 1.6;
-    }
-
-    .group-title {
-      margin: 28px 0 14px;
-      color: #f2c18d;
-      font-size: 22px;
-    }
-
-    .form-grid-custom {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(220px, 1fr));
-      gap: 18px;
-    }
-
-    .form-group-custom {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .form-group-custom.full {
-      grid-column: 1 / -1;
-    }
-
-    .form-label-custom {
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .form-input-custom,
-    .form-textarea-custom,
-    .form-select-custom {
-      width: 100%;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.04);
-      color: #fff;
-      padding: 14px 14px;
-      border-radius: 14px;
-      outline: none;
-      font-size: 14px;
-      appearance: none;
-      -webkit-appearance: none;
-      box-sizing: border-box;
-    }
-
-    .form-select-custom {
-      color-scheme: dark;
-    }
-
-    .form-select-custom option,
-    .form-select-custom optgroup {
-      background-color: #2b2b2b;
-      color: #ffffff;
-    }
-
-    .form-input-custom::placeholder,
-    .form-textarea-custom::placeholder {
-      color: rgba(255,255,255,0.45);
-    }
-
-    .form-textarea-custom {
-      min-height: 140px;
-      resize: vertical;
-    }
-
-    .btn-row-custom {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 22px;
-    }
-
-    .btn-custom {
-      border: none;
-      border-radius: 14px;
-      padding: 12px 18px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.25s ease;
-    }
-
-    .btn-primary-custom {
-      background: linear-gradient(135deg, #b87333, #d49457);
-      color: #fff;
-    }
-
-    .btn-primary-custom:hover {
-      transform: translateY(-1px);
-      opacity: 0.95;
-    }
-
-    .btn-secondary-custom {
-      background: rgba(255,255,255,0.06);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.12);
-    }
-
-    .btn-danger-custom {
-      background: rgba(220, 53, 69, 0.18);
-      color: #ffb3bc;
-      border: 1px solid rgba(220, 53, 69, 0.35);
-    }
-
-    .btn-warning-custom {
-      background: rgba(255, 193, 7, 0.16);
-      color: #ffd96a;
-      border: 1px solid rgba(255, 193, 7, 0.35);
-    }
-
-    .btn-success-custom {
-      background: rgba(40, 167, 69, 0.18);
-      color: #8df0a6;
-      border: 1px solid rgba(40, 167, 69, 0.35);
-    }
-
-    .players-btn {
-      background: rgba(184,115,51,0.18);
-      color: #f2c18d;
-      border: 1px solid rgba(184,115,51,0.35);
-    }
-
-    .players-btn:hover {
-      background: rgba(184,115,51,0.28);
-    }
-
-    .teams-grid,
-    .matches-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
-      margin-top: 16px;
-    }
-
-    .team-box,
-    .match-box,
-    .event-box {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
-      padding: 18px;
-    }
-
-    .team-box h3,
-    .match-box h3,
-    .event-box h3 {
-      margin: 0 0 10px;
-      color: #fff;
-      font-size: 20px;
-    }
-
-    .team-meta,
-    .match-meta,
-    .status-tag {
-      display: inline-block;
-      margin-bottom: 14px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .team-meta,
-    .match-meta {
-      background: rgba(184,115,51,0.18);
-      color: #f2c18d;
-    }
-
-    .status-nao-iniciado {
-      background: rgba(255,255,255,0.10);
-      color: #d9d9d9;
-    }
-
-    .status-andamento {
-      background: rgba(255, 193, 7, 0.16);
-      color: #ffd96a;
-    }
-
-    .status-intervalo {
-      background: rgba(90, 160, 255, 0.16);
-      color: #9cc4ff;
-    }
-
-    .status-finalizado {
-      background: rgba(40, 167, 69, 0.18);
-      color: #8df0a6;
-    }
-
-    .team-box p,
-    .match-box p,
-    .event-box p {
-      color: rgba(255,255,255,0.82);
-      margin: 7px 0;
-      line-height: 1.6;
-    }
-
-    .team-actions,
-    .match-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-
-    .players-panel,
-    .match-management-panel {
-      display: none;
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .players-panel.show,
-    .match-management-panel.show {
-      display: block;
-    }
-
-    .players-panel ul {
-      margin: 0;
-      padding-left: 18px;
-      color: rgba(255,255,255,0.82);
-      line-height: 1.7;
-    }
-
-    .empty-box {
-      background: rgba(255,255,255,0.03);
-      border: 1px dashed rgba(255,255,255,0.15);
-      border-radius: 18px;
-      padding: 26px;
-      color: rgba(255,255,255,0.65);
-      text-align: center;
-      margin-top: 16px;
-    }
-
-    .score-line {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin: 12px 0;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .score-badge {
-      min-width: 40px;
-      text-align: center;
-      padding: 8px 10px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.07);
-    }
-
-    .mini-form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(220px, 1fr));
-      gap: 14px;
-      margin-top: 14px;
-    }
-
-    .event-list {
-      display: grid;
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .event-tag {
-      display: inline-block;
-      padding: 5px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .tag-goal {
-      background: rgba(40, 167, 69, 0.18);
-      color: #8df0a6;
-    }
-
-    .tag-yellow {
-      background: rgba(255, 193, 7, 0.16);
-      color: #ffd96a;
-    }
-
-    .tag-red {
-      background: rgba(220, 53, 69, 0.18);
-      color: #ffb3bc;
-    }
-
-    .help-text {
-      color: rgba(255,255,255,0.6);
-      font-size: 13px;
-      line-height: 1.5;
-      margin-top: 6px;
-    }
-
-    .login-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(10, 10, 10, 0.92);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      padding: 20px;
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 420px;
-      background: #151821;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 22px;
-      padding: 28px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-      box-sizing: border-box;
-    }
-
-    .login-card h2 {
-      margin: 0 0 10px;
-      color: #fff;
-      font-size: 26px;
-    }
-
-    .login-card p {
-      margin: 0 0 18px;
-      color: rgba(255,255,255,0.68);
-      line-height: 1.6;
-    }
-
-    .login-error {
-      color: #ffb3bc;
-      margin-top: 12px;
-      font-size: 14px;
-      display: none;
-    }
+    .sidebar { background:#151821; }
+    .sidebar .nav-section, .sidebar .logo { position:relative; z-index:2; }
 
     @media (max-width: 900px) {
-      .dashboard {
-        display: block;
-      }
-
+      .dashboard { display:block; }
       .sidebar {
-        position: fixed;
-        top: 0;
-        left: -290px;
-        width: 270px;
-        height: 100vh;
-        z-index: 9999;
-        transition: left 0.3s ease;
-        overflow-y: auto;
+        position:fixed !important; top:0; left:-280px; width:280px; height:100vh; z-index:10001;
+        transition:left 0.3s ease; overflow-y:auto; background:#151821; box-shadow:10px 0 30px rgba(0,0,0,0.35);
       }
-
-      .sidebar.mobile-open {
-        left: 0;
-      }
-
-      .sidebar-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.45);
-        opacity: 0;
-        visibility: hidden;
-        transition: 0.3s ease;
-        z-index: 9998;
-      }
-
-      .sidebar-overlay.show {
-        opacity: 1;
-        visibility: visible;
-      }
-
+      .sidebar.mobile-open { left:0; }
+      .sidebar-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); opacity:0; visibility:hidden; transition:0.3s ease; z-index:10000; }
+      .sidebar-overlay.show { opacity:1; visibility:visible; }
       .mobile-menu-toggle {
-        position: fixed;
-        top: 14px;
-        left: 14px;
-        z-index: 10000;
-        width: 48px;
-        height: 48px;
-        border: none;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #b87333, #d49457);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position:fixed; top:14px; left:14px; z-index:10002; width:48px; height:48px; border:none; border-radius:14px;
+        background:linear-gradient(135deg, #b87333, #d49457); display:flex; align-items:center; justify-content:center;
       }
-
-      .main-content {
-        width: 100%;
-        padding: 76px 14px 20px;
-        box-sizing: border-box;
-      }
-
-      .page-header h1 {
-        font-size: 28px;
-        line-height: 1.2;
-      }
-
-      .page-header p {
-        font-size: 14px;
-        line-height: 1.5;
-      }
-
-      .card,
-      .team-box,
-      .match-box,
-      .event-box {
-        padding: 16px;
-        border-radius: 16px;
-      }
-
-      .form-grid-custom,
-      .mini-form-grid {
-        grid-template-columns: 1fr !important;
-      }
-
-      .admin-nav,
-      .btn-row-custom,
-      .team-actions,
-      .match-actions {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .admin-tab-btn,
-      .btn-custom {
-        width: 100%;
-        text-align: center;
-        justify-content: center;
-      }
-
-      .score-line {
-        flex-direction: column;
-        text-align: center;
-        gap: 14px;
-      }
-
-      .section-title,
-      .group-title {
-        font-size: 20px;
-      }
-
-      .form-input-custom,
-      .form-textarea-custom,
-      .form-select-custom {
-        font-size: 16px;
-      }
-
-      .login-card {
-        padding: 22px;
-      }
-
-      .login-card h2 {
-        font-size: 22px;
-      }
+      .main-content { width:100%; padding:76px 14px 20px; box-sizing:border-box; }
+      .page-header h1 { font-size:28px; line-height:1.2; }
+      .page-header p { font-size:14px; line-height:1.5; }
+      .card, .team-box, .match-box, .event-box { padding:16px; border-radius:16px; }
+      .form-grid-custom, .mini-form-grid { grid-template-columns:1fr !important; }
+      .admin-nav, .btn-row-custom, .team-actions, .match-actions { flex-direction:column; align-items:stretch; }
+      .admin-tab-btn, .btn-custom { width:100%; text-align:center; justify-content:center; }
+      .score-line { flex-direction:column; text-align:center; gap:14px; }
+      .section-title, .group-title { font-size:20px; }
+      .form-input-custom, .form-textarea-custom, .form-select-custom { font-size:16px; }
+      .login-card { padding:22px; }
+      .login-card h2 { font-size:22px; }
     }
 
     @media (max-width: 600px) {
-      .main-content {
-        padding: 74px 10px 18px;
-      }
-
-      .page-header h1 {
-        font-size: 24px;
-      }
-
-      .card,
-      .team-box,
-      .match-box,
-      .event-box {
-        padding: 14px;
-      }
-
-      .score-badge {
-        min-width: 38px;
-        padding: 7px 8px;
-      }
-
-      .logo-text {
-        font-size: 14px;
-      }
-
-      .login-overlay {
-        padding: 12px;
-      }
-
-      .login-card {
-        padding: 18px;
-        border-radius: 18px;
-      }
+      .main-content { padding:74px 10px 18px; }
+      .page-header h1 { font-size:24px; }
+      .card, .team-box, .match-box, .event-box { padding:14px; }
+      .score-badge { min-width:38px; padding:7px 8px; }
+      .logo-text { font-size:14px; }
+      .login-overlay { padding:12px; }
+      .login-card { padding:18px; border-radius:18px; }
     }
   </style>
 </head>
@@ -584,9 +130,7 @@
   <div id="adminContent" style="display:none;">
     <button class="mobile-menu-toggle" id="mobileMenuToggle">
       <div class="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
       </div>
     </button>
 
@@ -595,15 +139,12 @@
     <div class="dashboard">
       <aside class="sidebar" id="sidebar">
         <div class="logo">
-          <div class="logo-icon">
-            <img src="logo.png" alt="Logo da Escola">
-          </div>
+          <div class="logo-icon"><img src="logo.png" alt="Logo da Escola"></div>
           <span class="logo-text">INTERCLASSE WP - 2026</span>
         </div>
 
         <nav class="nav-section">
           <div class="nav-label">Menu Principal</div>
-
           <a href="index.html" class="nav-item">Início</a>
           <a href="jogos.html" class="nav-item">Jogos</a>
           <a href="classificacao.html" class="nav-item">Classificação</a>
@@ -747,7 +288,6 @@
 
     const ADMIN_PASSWORD = "1008";
     const FIXED_SPORTS = ["Futsal", "Volei", "Pingpong"];
-
     const teamForm = document.getElementById("teamForm");
     const editIndexInput = document.getElementById("editIndex");
     const formTitle = document.getElementById("formTitle");
@@ -755,7 +295,6 @@
     const cancelEditButton = document.getElementById("cancelEditButton");
     const clearAllTeamsButton = document.getElementById("clearAllTeamsButton");
     const teamsContainer = document.getElementById("teamsContainer");
-
     const matchForm = document.getElementById("matchForm");
     const matchSport = document.getElementById("matchSport");
     const teamASelect = document.getElementById("teamA");
@@ -764,7 +303,6 @@
     const matchTimeInput = document.getElementById("matchTime");
     const clearAllMatchesButton = document.getElementById("clearAllMatchesButton");
     const matchesContainer = document.getElementById("matchesContainer");
-
     const fields = {
       sport: document.getElementById("sport"),
       teamName: document.getElementById("teamName"),
@@ -788,9 +326,7 @@
     window.checkAdminPassword = checkAdminPassword;
 
     function escapeHtml(text) {
-      return String(text ?? "")
-        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      return String(text ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
     function updateTeamFormFields() {
@@ -798,7 +334,6 @@
       const teamNameGroup = document.getElementById("teamNameGroup");
       const captainGroup = document.getElementById("captainGroup");
       const playersHelp = document.getElementById("playersHelp");
-
       fields.teamName.required = false;
       fields.captain.required = false;
 
@@ -1001,20 +536,15 @@
               status: match.status || "nao_iniciado",
               events: Array.isArray(match.events) ? match.events : []
             };
-            if (match.teamAKey === previousKey) {
-              updated.teamAKey = newKey;
-              updated.teamAName = newKey;
-            }
-            if (match.teamBKey === previousKey) {
-              updated.teamBKey = newKey;
-              updated.teamBName = newKey;
-            }
+            if (match.teamAKey === previousKey) { updated.teamAKey = newKey; updated.teamAName = newKey; }
+            if (match.teamBKey === previousKey) { updated.teamBKey = newKey; updated.teamBName = newKey; }
             await updateMatch(match.id, updated);
           }
         }
       } else {
         await createTeam(teamData);
       }
+
       resetTeamForm();
     });
 
@@ -1029,9 +559,7 @@
       }
     });
 
-    function getTeamsBySport(sport) {
-      return teamsCache.filter(team => team.sport === sport);
-    }
+    function getTeamsBySport(sport) { return teamsCache.filter(team => team.sport === sport); }
 
     function populateParticipantsBySport() {
       const sport = matchSport.value;
@@ -1043,13 +571,9 @@
       teams.forEach(team => {
         const label = buildDisplayName(team);
         const optionA = document.createElement("option");
-        optionA.value = label;
-        optionA.textContent = label;
-        teamASelect.appendChild(optionA);
+        optionA.value = label; optionA.textContent = label; teamASelect.appendChild(optionA);
         const optionB = document.createElement("option");
-        optionB.value = label;
-        optionB.textContent = label;
-        teamBSelect.appendChild(optionB);
+        optionB.value = label; optionB.textContent = label; teamBSelect.appendChild(optionB);
       });
       if ([...teamASelect.options].some(opt => opt.value === currentA)) teamASelect.value = currentA;
       if ([...teamBSelect.options].some(opt => opt.value === currentB)) teamBSelect.value = currentB;
@@ -1067,10 +591,12 @@
       const matchTime = matchTimeInput.value;
       if (!sport || !teamAName || !teamBName || !matchDate || !matchTime) return;
       if (teamAName === teamBName) return alert("Selecione participantes diferentes.");
+
       await createMatch({
         sport, teamAKey: teamAName, teamBKey: teamBName, teamAName, teamBName,
         date: matchDate, time: matchTime, goalsA: 0, goalsB: 0, status: "nao_iniciado", events: []
       });
+
       matchForm.reset();
       populateParticipantsBySport();
     });
@@ -1080,9 +606,7 @@
       if (confirm("Deseja apagar todos os jogos cadastrados?")) await clearAllMatches();
     });
 
-    function getTeamByKey(key) {
-      return teamsCache.find(team => buildDisplayName(team) === key);
-    }
+    function getTeamByKey(key) { return teamsCache.find(team => buildDisplayName(team) === key); }
 
     function openMatchManagePanel(matchId, button) {
       const panel = document.getElementById(`manage-panel-${matchId}`);
@@ -1122,20 +646,20 @@
       if (!teamName || !playerName || !eventType) return alert("Selecione participante, jogador e evento.");
       const team = getTeamByKey(teamName);
       const player = team ? (team.players || []).find(item => item.name === playerName) : null;
+
       const updated = {
-        sport: match.sport, teamAKey: match.teamAKey, teamBKey: match.teamBKey,
-        teamAName: match.teamAName, teamBName: match.teamBName, date: match.date, time: match.time,
-        goalsA: Number(match.goalsA) || 0, goalsB: Number(match.goalsB) || 0,
+        sport: match.sport, teamAKey: match.teamAKey, teamBKey: match.teamBKey, teamAName: match.teamAName, teamBName: match.teamBName,
+        date: match.date, time: match.time, goalsA: Number(match.goalsA) || 0, goalsB: Number(match.goalsB) || 0,
         status: match.status || "nao_iniciado", events: Array.isArray(match.events) ? [...match.events] : []
       };
-      updated.events.push({
-        type: eventType, teamName, playerName, playerNumber: player ? player.number : "",
-        createdAt: new Date().toLocaleString("pt-BR")
-      });
+
+      updated.events.push({ type: eventType, teamName, playerName, playerNumber: player ? player.number : "", createdAt: new Date().toLocaleString("pt-BR") });
+
       if (eventType === "goal") {
         if (teamName === updated.teamAKey) updated.goalsA += 1;
         else updated.goalsB += 1;
       }
+
       await updateMatch(matchId, updated);
     }
     window.addEventToMatch = addEventToMatch;
@@ -1144,9 +668,8 @@
       const match = matchesCache.find(item => item.id === matchId);
       if (!match) return;
       const updated = {
-        sport: match.sport, teamAKey: match.teamAKey, teamBKey: match.teamBKey,
-        teamAName: match.teamAName, teamBName: match.teamBName, date: match.date, time: match.time,
-        goalsA: Number(match.goalsA) || 0, goalsB: Number(match.goalsB) || 0,
+        sport: match.sport, teamAKey: match.teamAKey, teamBKey: match.teamBKey, teamAName: match.teamAName, teamBName: match.teamBName,
+        date: match.date, time: match.time, goalsA: Number(match.goalsA) || 0, goalsB: Number(match.goalsB) || 0,
         status: newStatus, events: Array.isArray(match.events) ? match.events : []
       };
       await updateMatch(matchId, updated);
@@ -1161,17 +684,24 @@
 
     function renderEvents(events) {
       if (!events || !events.length) return `<div class="empty-box">Nenhum evento registrado neste jogo.</div>`;
-      return `<div class="event-list">${events.map(event => {
-        let tagClass = "tag-goal", tagLabel = "Gol";
-        if (event.type === "yellow") { tagClass = "tag-yellow"; tagLabel = "Cartão amarelo"; }
-        else if (event.type === "red") { tagClass = "tag-red"; tagLabel = "Cartão vermelho"; }
-        return `<div class="event-box">
-          <span class="event-tag ${tagClass}">${tagLabel}</span>
-          <p><strong>Participante:</strong> ${escapeHtml(event.teamName)}</p>
-          <p><strong>Jogador:</strong> ${event.playerNumber ? escapeHtml(event.playerNumber) + " - " : ""}${escapeHtml(event.playerName)}</p>
-          <p><strong>Registro:</strong> ${escapeHtml(event.createdAt)}</p>
-        </div>`;
-      }).join("")}</div>`;
+      return `
+        <div class="event-list">
+          ${events.map(event => {
+            let tagClass = "tag-goal";
+            let tagLabel = "Gol";
+            if (event.type === "yellow") { tagClass = "tag-yellow"; tagLabel = "Cartão amarelo"; }
+            else if (event.type === "red") { tagClass = "tag-red"; tagLabel = "Cartão vermelho"; }
+            return `
+              <div class="event-box">
+                <span class="event-tag ${tagClass}">${tagLabel}</span>
+                <p><strong>Participante:</strong> ${escapeHtml(event.teamName)}</p>
+                <p><strong>Jogador:</strong> ${event.playerNumber ? escapeHtml(event.playerNumber) + " - " : ""}${escapeHtml(event.playerName)}</p>
+                <p><strong>Registro:</strong> ${escapeHtml(event.createdAt)}</p>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
     }
 
     function getStatusLabel(status) {
@@ -1206,69 +736,72 @@
           html += `<div class="empty-box">Nenhum jogo cadastrado em ${escapeHtml(sport)}.</div>`;
           return;
         }
+
         html += `<div class="matches-grid">`;
         sportMatches.forEach(match => {
           const panelId = `match-events-${match.id}`;
           const managePanelId = `manage-panel-${match.id}`;
           const isFinalized = match.status === "finalizado";
-          html += `<div class="match-box">
-            <div class="match-meta">${escapeHtml(match.sport)}</div>
-            <div class="status-tag ${getStatusClass(match.status)}">${getStatusLabel(match.status)}</div>
-            <h3>${escapeHtml(match.teamAName)} x ${escapeHtml(match.teamBName)}</h3>
-            <p><strong>Data:</strong> ${formatDateBR(match.date)}</p>
-            <p><strong>Horário de início:</strong> ${escapeHtml(match.time || "Não informado")}</p>
-            <div class="score-line">
-              <span>${escapeHtml(match.teamAName)}</span>
-              <span class="score-badge">${Number(match.goalsA) || 0}</span>
-              <span>x</span>
-              <span class="score-badge">${Number(match.goalsB) || 0}</span>
-              <span>${escapeHtml(match.teamBName)}</span>
-            </div>
-            <div class="match-actions">
-              <button class="btn-custom btn-secondary-custom" onclick="openMatchManagePanel('${match.id}', this)">Gerenciar jogo</button>
-              <button class="btn-custom players-btn" data-open-label="Ocultar eventos" data-closed-label="Eventos" onclick="togglePlayers('${panelId}', this)">Eventos</button>
-              <button class="btn-custom btn-danger-custom" onclick="deleteMatch('${match.id}')">Excluir jogo</button>
-            </div>
-            <div class="match-management-panel" id="${managePanelId}">
-              <div class="btn-row-custom">
-                <button class="btn-custom btn-secondary-custom" onclick="setMatchStatus('${match.id}', 'nao_iniciado')">Não iniciado</button>
-                <button class="btn-custom btn-warning-custom" onclick="setMatchStatus('${match.id}', 'andamento')">Iniciar jogo</button>
-                <button class="btn-custom players-btn" onclick="setMatchStatus('${match.id}', 'intervalo')">Intervalo</button>
-                <button class="btn-custom btn-success-custom" onclick="setMatchStatus('${match.id}', 'finalizado')">Finalizar</button>
+          html += `
+            <div class="match-box">
+              <div class="match-meta">${escapeHtml(match.sport)}</div>
+              <div class="status-tag ${getStatusClass(match.status)}">${getStatusLabel(match.status)}</div>
+              <h3>${escapeHtml(match.teamAName)} x ${escapeHtml(match.teamBName)}</h3>
+              <p><strong>Data:</strong> ${formatDateBR(match.date)}</p>
+              <p><strong>Horário de início:</strong> ${escapeHtml(match.time || "Não informado")}</p>
+              <div class="score-line">
+                <span>${escapeHtml(match.teamAName)}</span>
+                <span class="score-badge">${Number(match.goalsA) || 0}</span>
+                <span>x</span>
+                <span class="score-badge">${Number(match.goalsB) || 0}</span>
+                <span>${escapeHtml(match.teamBName)}</span>
               </div>
-              <div class="mini-form-grid">
-                <div class="form-group-custom">
-                  <label class="form-label-custom" for="event-team-${match.id}">Participante</label>
-                  <select class="form-select-custom" id="event-team-${match.id}" onchange="updatePlayerSelect('${match.id}')" ${isFinalized ? "disabled" : ""}>
-                    <option value="">Selecione</option>
-                    <option value="${escapeHtml(match.teamAKey)}">${escapeHtml(match.teamAName)}</option>
-                    <option value="${escapeHtml(match.teamBKey)}">${escapeHtml(match.teamBName)}</option>
-                  </select>
+              <div class="match-actions">
+                <button class="btn-custom btn-secondary-custom" onclick="openMatchManagePanel('${match.id}', this)">Gerenciar jogo</button>
+                <button class="btn-custom players-btn" data-open-label="Ocultar eventos" data-closed-label="Eventos" onclick="togglePlayers('${panelId}', this)">Eventos</button>
+                <button class="btn-custom btn-danger-custom" onclick="deleteMatch('${match.id}')">Excluir jogo</button>
+              </div>
+              <div class="match-management-panel" id="${managePanelId}">
+                <div class="btn-row-custom">
+                  <button class="btn-custom btn-secondary-custom" onclick="setMatchStatus('${match.id}', 'nao_iniciado')">Não iniciado</button>
+                  <button class="btn-custom btn-warning-custom" onclick="setMatchStatus('${match.id}', 'andamento')">Iniciar jogo</button>
+                  <button class="btn-custom players-btn" onclick="setMatchStatus('${match.id}', 'intervalo')">Intervalo</button>
+                  <button class="btn-custom btn-success-custom" onclick="setMatchStatus('${match.id}', 'finalizado')">Finalizar</button>
                 </div>
-                <div class="form-group-custom">
-                  <label class="form-label-custom" for="event-player-${match.id}">Jogador</label>
-                  <select class="form-select-custom" id="event-player-${match.id}" ${isFinalized ? "disabled" : ""}>
-                    <option value="">Selecione</option>
-                  </select>
+                <div class="mini-form-grid">
+                  <div class="form-group-custom">
+                    <label class="form-label-custom" for="event-team-${match.id}">Participante</label>
+                    <select class="form-select-custom" id="event-team-${match.id}" onchange="updatePlayerSelect('${match.id}')" ${isFinalized ? "disabled" : ""}>
+                      <option value="">Selecione</option>
+                      <option value="${escapeHtml(match.teamAKey)}">${escapeHtml(match.teamAName)}</option>
+                      <option value="${escapeHtml(match.teamBKey)}">${escapeHtml(match.teamBName)}</option>
+                    </select>
+                  </div>
+                  <div class="form-group-custom">
+                    <label class="form-label-custom" for="event-player-${match.id}">Jogador</label>
+                    <select class="form-select-custom" id="event-player-${match.id}" ${isFinalized ? "disabled" : ""}>
+                      <option value="">Selecione</option>
+                    </select>
+                  </div>
+                  <div class="form-group-custom">
+                    <label class="form-label-custom" for="event-type-${match.id}">Evento</label>
+                    <select class="form-select-custom" id="event-type-${match.id}" ${isFinalized ? "disabled" : ""}>
+                      <option value="">Selecione</option>
+                      <option value="goal">Gol</option>
+                      <option value="yellow">Cartão amarelo</option>
+                      <option value="red">Cartão vermelho</option>
+                    </select>
+                  </div>
                 </div>
-                <div class="form-group-custom">
-                  <label class="form-label-custom" for="event-type-${match.id}">Evento</label>
-                  <select class="form-select-custom" id="event-type-${match.id}" ${isFinalized ? "disabled" : ""}>
-                    <option value="">Selecione</option>
-                    <option value="goal">Gol</option>
-                    <option value="yellow">Cartão amarelo</option>
-                    <option value="red">Cartão vermelho</option>
-                  </select>
+                <div class="btn-row-custom">
+                  <button class="btn-custom btn-success-custom" onclick="addEventToMatch('${match.id}')" ${isFinalized ? "disabled" : ""}>Adicionar evento</button>
                 </div>
               </div>
-              <div class="btn-row-custom">
-                <button class="btn-custom btn-success-custom" onclick="addEventToMatch('${match.id}')" ${isFinalized ? "disabled" : ""}>Adicionar evento</button>
+              <div class="players-panel" id="${panelId}">
+                ${renderEvents(match.events || [])}
               </div>
             </div>
-            <div class="players-panel" id="${panelId}">
-              ${renderEvents(match.events || [])}
-            </div>
-          </div>`;
+          `;
         });
         html += `</div>`;
       });
@@ -1281,8 +814,14 @@
 
     if (mobileMenuToggle && sidebar && sidebarOverlay) {
       mobileMenuToggle.addEventListener("click", () => {
-        sidebar.classList.toggle("mobile-open");
-        sidebarOverlay.classList.toggle("show");
+        const isOpen = sidebar.classList.contains("mobile-open");
+        if (isOpen) {
+          sidebar.classList.remove("mobile-open");
+          sidebarOverlay.classList.remove("show");
+        } else {
+          sidebar.classList.add("mobile-open");
+          sidebarOverlay.classList.add("show");
+        }
       });
 
       sidebarOverlay.addEventListener("click", () => {
