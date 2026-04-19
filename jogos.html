@@ -13,21 +13,144 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
     }
 
-    .match-box {
+    .custom-active-link {
+      background: linear-gradient(135deg, #b87333, #d49457);
+      color: #fff;
+    }
+
+    .card {
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: 22px;
+    }
+
+    .section-subtitle {
+      margin: 0 0 18px;
+      color: rgba(255,255,255,0.70);
+      line-height: 1.6;
+    }
+
+    .empty-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(255,255,255,0.15);
+      border-radius: 18px;
+      padding: 26px;
+      color: rgba(255,255,255,0.65);
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .modalities-nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .modality-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      color: #f2c18d;
+      background: rgba(184,115,51,0.14);
+      border: 1px solid rgba(184,115,51,0.30);
+      transition: 0.25s ease;
+    }
+
+    .modality-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(184,115,51,0.24);
+    }
+
+    .games-group {
+      margin-top: 28px;
+      scroll-margin-top: 24px;
+    }
+
+    .games-title {
+      margin: 0 0 14px;
+      color: #f2c18d;
+      font-size: 22px;
+    }
+
+    .matches-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      margin-top: 10px;
+    }
+
+    .match-box,
+    .event-box {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 18px;
       padding: 18px;
-      margin-bottom: 18px;
+    }
+
+    .match-meta,
+    .status-tag {
+      display: inline-block;
+      margin-bottom: 10px;
+      margin-right: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .match-meta {
+      background: rgba(184,115,51,0.18);
+      color: #f2c18d;
+    }
+
+    .status-nao-iniciado {
+      background: rgba(255,255,255,0.10);
+      color: #d9d9d9;
+    }
+
+    .status-andamento {
+      background: rgba(255, 193, 7, 0.16);
+      color: #ffd96a;
+    }
+
+    .status-intervalo {
+      background: rgba(90, 160, 255, 0.16);
+      color: #9cc4ff;
+    }
+
+    .status-finalizado {
+      background: rgba(40, 167, 69, 0.18);
+      color: #8df0a6;
     }
 
     .match-box h3 {
-      margin-bottom: 10px;
+      margin: 6px 0 10px;
+      color: #fff;
+      font-size: 20px;
     }
 
-    /* 🔥 PLACAR CORRIGIDO */
+    .match-box p,
+    .event-box p {
+      color: rgba(255,255,255,0.82);
+      margin: 7px 0;
+      line-height: 1.6;
+    }
+
+    /* PLACAR EM LINHA */
     .score-line {
       display: flex;
       align-items: center;
@@ -40,10 +163,14 @@
       border-radius: 14px;
       padding: 14px;
       flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .team-name {
       white-space: nowrap;
+      text-align: center;
+      flex: 0 0 auto;
     }
 
     .score-center {
@@ -51,6 +178,7 @@
       align-items: center;
       gap: 6px;
       font-size: 18px;
+      flex: 0 0 auto;
     }
 
     .score-badge {
@@ -59,13 +187,140 @@
       padding: 6px 8px;
       border-radius: 10px;
       background: rgba(255,255,255,0.08);
+      color: #fff;
     }
 
-    /* 🔥 MOBILE */
+    .events-toggle-btn {
+      border: none;
+      border-radius: 14px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.25s ease;
+      background: rgba(184,115,51,0.18);
+      color: #f2c18d;
+      border: 1px solid rgba(184,115,51,0.35);
+      margin-top: 10px;
+    }
+
+    .events-toggle-btn:hover {
+      background: rgba(184,115,51,0.28);
+    }
+
+    .events-panel {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .events-panel.show {
+      display: block;
+    }
+
+    .event-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .event-tag {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .tag-goal {
+      background: rgba(40, 167, 69, 0.18);
+      color: #8df0a6;
+    }
+
+    .tag-yellow {
+      background: rgba(255, 193, 7, 0.16);
+      color: #ffd96a;
+    }
+
+    .tag-red {
+      background: rgba(220, 53, 69, 0.18);
+      color: #ffb3bc;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 280px !important;
+        height: 100vh !important;
+        z-index: 10001 !important;
+        overflow-y: auto !important;
+        background: #151821 !important;
+        transform: translateX(-110%) !important;
+        transition: transform 0.3s ease !important;
+        will-change: transform;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+
+      .sidebar.mobile-open {
+        transform: translateX(0) !important;
+      }
+
+      .sidebar-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        background: rgba(0, 0, 0, 0.45) !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        z-index: 10000 !important;
+        transition: opacity 0.3s ease, visibility 0.3s ease !important;
+        display: block !important;
+      }
+
+      .sidebar-overlay.show {
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+
+      .mobile-menu-toggle {
+        position: fixed !important;
+        top: 14px !important;
+        left: 14px !important;
+        z-index: 10002 !important;
+        display: flex !important;
+      }
+
+      .main-content {
+        width: 100% !important;
+        padding-top: 76px !important;
+        box-sizing: border-box;
+      }
+
+      .modalities-nav {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .modality-btn,
+      .events-toggle-btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+      }
+    }
+
     @media (max-width: 600px) {
       .score-line {
         gap: 6px;
         font-size: 14px;
+        justify-content: flex-start;
       }
 
       .score-center {
@@ -79,63 +334,292 @@
     }
   </style>
 </head>
-
 <body>
-
-<div class="dashboard">
-  <aside class="sidebar">
-    <div class="logo">
-      <div class="logo-icon">
-        <img src="logo.png" alt="Logo da Escola">
-      </div>
-      <span class="logo-text">INTERCLASSE WP - 2026</span>
+  <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" onclick="toggleMobileMenu()">
+    <div class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
-  </aside>
+  </button>
 
-  <main class="main-content">
-    <h1>Jogos Oficiais</h1>
-    <div id="gamesContainer"></div>
-  </main>
-</div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<script type="module">
-import { listenMatches } from "./firebase.js";
-
-function escapeHtml(text) {
-  return String(text ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function renderGames(matches) {
-  const container = document.getElementById("gamesContainer");
-
-  container.innerHTML = matches.map(match => `
-    <div class="match-box">
-
-      <h3>${escapeHtml(match.teamAName)} x ${escapeHtml(match.teamBName)}</h3>
-
-      <div class="score-line">
-        <div class="team-name">${escapeHtml(match.teamAName)}</div>
-
-        <div class="score-center">
-          <span class="score-badge">${Number(match.goalsA || 0)}</span>
-          <span>x</span>
-          <span class="score-badge">${Number(match.goalsB || 0)}</span>
+  <div class="dashboard">
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">
+        <div class="logo-icon">
+          <img src="logo.png" alt="Logo da Escola">
         </div>
-
-        <div class="team-name">${escapeHtml(match.teamBName)}</div>
+        <span class="logo-text">INTERCLASSE WP - 2026</span>
       </div>
 
-    </div>
-  `).join("");
-}
+      <nav class="nav-section">
+        <div class="nav-label">Menu Principal</div>
 
-listenMatches((matches) => {
-  renderGames(matches);
-});
-</script>
+        <a href="index.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+          Início
+        </a>
 
+        <a href="jogos.html" class="nav-item custom-active-link">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          Jogos
+        </a>
+
+        <a href="classificacao.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 3v18h18"></path>
+            <path d="M18 17V9"></path>
+            <path d="M13 17V5"></path>
+            <path d="M8 17v-3"></path>
+          </svg>
+          Classificação
+        </a>
+
+        <a href="times.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          Times
+        </a>
+
+        <a href="administracao.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+          </svg>
+          Administração
+        </a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Jogos Oficiais - Atualizado</h1>
+        <p>Visualize as datas de cada jogos por modalidade.</p>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Modalidades</h2>
+        <div class="modalities-nav">
+          <a href="#games-futsal" class="modality-btn">Futsal</a>
+          <a href="#games-volei" class="modality-btn">Volei</a>
+          <a href="#games-pingpong" class="modality-btn">Pingpong</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Partidas cadastradas</h2>
+        <div id="gamesContainer"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/templatemo-crypto-script.js"></script>
+  <script type="module">
+    import { listenMatches } from "./firebase.js";
+
+    const FIXED_SPORTS = ["Futsal", "Volei", "Pingpong"];
+
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatDateBR(dateStr) {
+      if (!dateStr) return "Não informada";
+      const [year, month, day] = dateStr.split("-");
+      if (!year || !month || !day) return dateStr;
+      return `${day}/${month}/${year}`;
+    }
+
+    function createSafeId(text) {
+      return "games-" + text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function toggleEvents(panelId, button) {
+      const panel = document.getElementById(panelId);
+      if (!panel) return;
+
+      panel.classList.toggle("show");
+      button.textContent = panel.classList.contains("show") ? "Ocultar eventos" : "Ver eventos";
+    }
+    window.toggleEvents = toggleEvents;
+
+    function getStatusLabel(status) {
+      if (status === "nao_iniciado") return "Não iniciado";
+      if (status === "andamento") return "Em andamento";
+      if (status === "intervalo") return "Intervalo";
+      if (status === "finalizado") return "Finalizado";
+      return "Não iniciado";
+    }
+
+    function getStatusClass(status) {
+      if (status === "nao_iniciado") return "status-nao-iniciado";
+      if (status === "andamento") return "status-andamento";
+      if (status === "intervalo") return "status-intervalo";
+      if (status === "finalizado") return "status-finalizado";
+      return "status-nao-iniciado";
+    }
+
+    function renderEvents(events) {
+      if (!events || !events.length) {
+        return `<div class="empty-box">Nenhum evento registrado neste jogo.</div>`;
+      }
+
+      return `
+        <div class="event-list">
+          ${events.map(event => {
+            let tagClass = "tag-goal";
+            let tagLabel = "Gol";
+
+            if (event.type === "yellow") {
+              tagClass = "tag-yellow";
+              tagLabel = "Cartão amarelo";
+            } else if (event.type === "red") {
+              tagClass = "tag-red";
+              tagLabel = "Cartão vermelho";
+            }
+
+            return `
+              <div class="event-box">
+                <span class="event-tag ${tagClass}">${tagLabel}</span>
+                <p><strong>Participante:</strong> ${escapeHtml(event.teamName)}</p>
+                <p><strong>Jogador:</strong> ${event.playerNumber ? escapeHtml(event.playerNumber) + " - " : ""}${escapeHtml(event.playerName)}</p>
+                <p><strong>Registro:</strong> ${escapeHtml(event.createdAt || "Não informado")}</p>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function renderGames(matches) {
+      const container = document.getElementById("gamesContainer");
+
+      let html = "";
+
+      FIXED_SPORTS.forEach(sport => {
+        const sectionId = createSafeId(sport);
+        const matchesBySport = matches
+          .filter(match => match.sport === sport)
+          .sort((a, b) => {
+            const dateTimeA = new Date(`${a.date || "9999-12-31"}T${a.time || "23:59"}`);
+            const dateTimeB = new Date(`${b.date || "9999-12-31"}T${b.time || "23:59"}`);
+            return dateTimeA - dateTimeB;
+          });
+
+        html += `
+          <div class="games-group" id="${sectionId}">
+            <h2 class="games-title">${escapeHtml(sport)}</h2>
+        `;
+
+        if (!matchesBySport.length) {
+          html += `<div class="empty-box">Nenhum jogo marcado em ${escapeHtml(sport)}.</div>`;
+        } else {
+          html += `<div class="matches-grid">`;
+
+          matchesBySport.forEach(match => {
+            const panelId = `events-${match.id}`;
+
+            html += `
+              <div class="match-box">
+                <div class="match-meta">${escapeHtml(match.sport)}</div>
+                <div class="status-tag ${getStatusClass(match.status)}">${getStatusLabel(match.status)}</div>
+                <h3>${escapeHtml(match.teamAName)} x ${escapeHtml(match.teamBName)}</h3>
+                <p><strong>Data:</strong> ${formatDateBR(match.date)}</p>
+                <p><strong>Horário de início:</strong> ${escapeHtml(match.time || "Não informado")}</p>
+
+                <div class="score-line">
+                  <div class="team-name">${escapeHtml(match.teamAName)}</div>
+                  <div class="score-center">
+                    <span class="score-badge">${Number(match.goalsA || 0)}</span>
+                    <span>x</span>
+                    <span class="score-badge">${Number(match.goalsB || 0)}</span>
+                  </div>
+                  <div class="team-name">${escapeHtml(match.teamBName)}</div>
+                </div>
+
+                <button class="events-toggle-btn" onclick="toggleEvents('${panelId}', this)">Ver eventos</button>
+
+                <div class="events-panel" id="${panelId}">
+                  ${renderEvents(match.events || [])}
+                </div>
+              </div>
+            `;
+          });
+
+          html += `</div>`;
+        }
+
+        html += `</div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    listenMatches((matches) => {
+      renderGames(matches);
+    });
+  </script>
+
+  <script>
+    function toggleMobileMenu() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+      if (!sidebar || !overlay) return;
+
+      sidebar.classList.toggle("mobile-open");
+      overlay.classList.toggle("show");
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const overlay = document.getElementById("sidebarOverlay");
+      const sidebar = document.getElementById("sidebar");
+
+      if (overlay && sidebar) {
+        overlay.addEventListener("click", function () {
+          sidebar.classList.remove("mobile-open");
+          overlay.classList.remove("show");
+        });
+      }
+
+      document.querySelectorAll(".sidebar .nav-item").forEach(item => {
+        item.addEventListener("click", function () {
+          if (sidebar && overlay) {
+            sidebar.classList.remove("mobile-open");
+            overlay.classList.remove("show");
+          }
+        });
+      });
+
+      window.addEventListener("resize", function () {
+        if (window.innerWidth > 900 && sidebar && overlay) {
+          sidebar.classList.remove("mobile-open");
+          overlay.classList.remove("show");
+        }
+      });
+    });
+  </script>
 </body>
 </html>
