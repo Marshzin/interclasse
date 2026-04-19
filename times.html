@@ -200,12 +200,12 @@
 
   <div class="dashboard">
     <aside class="sidebar" id="sidebar">
-    <div class="logo">
-    <div class="logo-icon">
-      <img src="logo.png" alt="Logo da Escola">
-    </div>
-      <span class="logo-text">INTERCLASSE WP - 2026</span>
-    </div>
+      <div class="logo">
+        <div class="logo-icon">
+          <img src="logo.png" alt="Logo da Escola">
+        </div>
+        <span class="logo-text">INTERCLASSE WP - 2026</span>
+      </div>
 
       <nav class="nav-section">
         <div class="nav-label">Menu Principal</div>
@@ -278,11 +278,19 @@
   </div>
 
   <script src="js/templatemo-crypto-script.js"></script>
-  <script>
-    const FIXED_SPORTS = ["Futsal", "Volei", "Pingpong"];
+  <script type="module">
+    import { listenTeams } from "./firebase.js";
 
-    function getTeams() {
-      return JSON.parse(localStorage.getItem("times") || "[]");
+    const FIXED_SPORTS = ["Futsal", "Volei", "Pingpong"];
+    const teamsContainer = document.getElementById("teamsContainer");
+
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     function createSafeId(text) {
@@ -299,7 +307,7 @@
         const first = team.players && team.players[0] ? team.players[0] : null;
         return first ? first.name : "Jogador";
       }
-      return team.teamName;
+      return team.teamName || "Equipe";
     }
 
     function togglePlayers(panelId, button) {
@@ -309,6 +317,7 @@
       panel.classList.toggle("show");
       button.textContent = panel.classList.contains("show") ? "Ocultar jogadores" : "Jogadores";
     }
+    window.togglePlayers = togglePlayers;
 
     function renderPlayersList(players, sport) {
       if (!players || !players.length) {
@@ -319,18 +328,15 @@
         <ul>
           ${players.map(player => {
             if (sport === "Futsal" && player.number) {
-              return `<li>${player.number} - ${player.name}</li>`;
+              return `<li>${escapeHtml(player.number)} - ${escapeHtml(player.name)}</li>`;
             }
-            return `<li>${player.name}</li>`;
+            return `<li>${escapeHtml(player.name)}</li>`;
           }).join("")}
         </ul>
       `;
     }
 
-    function renderTeams() {
-      const teamsContainer = document.getElementById("teamsContainer");
-      const teams = getTeams();
-
+    function renderTeams(teams) {
       let html = "";
 
       FIXED_SPORTS.forEach(sport => {
@@ -339,36 +345,35 @@
 
         html += `
           <div class="teams-group" id="${sportId}">
-            <h2 class="teams-group-title">${sport}</h2>
+            <h2 class="teams-group-title">${escapeHtml(sport)}</h2>
         `;
 
         if (!sportTeams.length) {
-          html += `<div class="empty-box">Nenhuma equipe cadastrada em ${sport}.</div>`;
+          html += `<div class="empty-box">Nenhuma equipe cadastrada em ${escapeHtml(sport)}.</div>`;
         } else {
           html += `<div class="teams-grid">`;
 
           sportTeams.forEach((team, index) => {
-            const globalIndex = `${sport}-${index}`;
-            const playersId = `players-panel-${globalIndex}`;
+            const playersId = `players-panel-${sport}-${index}-${team.id}`;
             const title = buildDisplayName(team);
 
             html += `
               <div class="team-box">
-                <div class="team-meta">${team.sport}</div>
-                <h3>${title}</h3>
+                <div class="team-meta">${escapeHtml(team.sport)}</div>
+                <h3>${escapeHtml(title)}</h3>
 
-                ${team.sport === "Futsal" ? `<p><strong>Capitão:</strong> ${team.captain || "-"}</p>` : ""}
+                ${team.sport === "Futsal" ? `<p><strong>Capitão:</strong> ${escapeHtml(team.captain || "-")}</p>` : ""}
                 ${team.sport === "Volei" ? `<p><strong>Equipe de Volei</strong></p>` : ""}
                 ${team.sport === "Pingpong" ? `<p><strong>Participante individual</strong></p>` : ""}
                 ${team.sport !== "Pingpong" ? `<p><strong>Jogadores cadastrados:</strong> ${team.players ? team.players.length : 0}</p>` : ""}
-                <p><strong>Pontos:</strong> ${team.points || 0}</p>
+                <p><strong>Pontos:</strong> ${Number(team.points || 0)}</p>
 
                 <div class="team-actions">
                   <button class="btn-custom players-btn" onclick="togglePlayers('${playersId}', this)">Jogadores</button>
                 </div>
 
                 <div class="players-panel" id="${playersId}">
-                  ${renderPlayersList(team.players, team.sport)}
+                  ${renderPlayersList(team.players || [], team.sport)}
                 </div>
               </div>
             `;
@@ -383,7 +388,9 @@
       teamsContainer.innerHTML = html;
     }
 
-    renderTeams();
+    listenTeams((teams) => {
+      renderTeams(teams);
+    });
   </script>
 </body>
 </html>
