@@ -244,6 +244,136 @@
       background: rgba(220, 53, 69, 0.18);
       color: #ffb3bc;
     }
+
+    @media (max-width: 900px) {
+      .dashboard {
+        display: block;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -290px;
+        width: 270px;
+        height: 100vh;
+        z-index: 9999;
+        transition: left 0.3s ease;
+        overflow-y: auto;
+      }
+
+      .sidebar.mobile-open {
+        left: 0;
+      }
+
+      .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s ease;
+        z-index: 9998;
+      }
+
+      .sidebar-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .mobile-menu-toggle {
+        position: fixed;
+        top: 14px;
+        left: 14px;
+        z-index: 10000;
+        width: 48px;
+        height: 48px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #b87333, #d49457);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .main-content {
+        width: 100%;
+        padding: 76px 14px 20px;
+        box-sizing: border-box;
+      }
+
+      .page-header h1 {
+        font-size: 28px;
+        line-height: 1.2;
+      }
+
+      .page-header p {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .card,
+      .match-box,
+      .event-box {
+        padding: 16px;
+        border-radius: 16px;
+      }
+
+      .modalities-nav {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .modality-btn,
+      .events-toggle-btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+      }
+
+      .score-line {
+        flex-direction: column;
+        text-align: center;
+        gap: 14px;
+      }
+
+      .team-name {
+        width: 100%;
+      }
+
+      .score-center {
+        justify-content: center;
+      }
+
+      .section-title,
+      .games-title {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .main-content {
+        padding: 74px 10px 18px;
+      }
+
+      .page-header h1 {
+        font-size: 24px;
+      }
+
+      .card,
+      .match-box,
+      .event-box {
+        padding: 14px;
+      }
+
+      .score-badge {
+        min-width: 38px;
+        padding: 7px 8px;
+      }
+
+      .logo-text {
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -364,7 +494,7 @@
       return "games-" + text
         .toLowerCase()
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[̀-ͯ]/g, "")
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
     }
@@ -488,6 +618,29 @@
       });
 
       container.innerHTML = html;
+    }
+
+    const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+    const sidebar = document.getElementById("sidebar");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+    if (mobileMenuToggle && sidebar && sidebarOverlay) {
+      mobileMenuToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("mobile-open");
+        sidebarOverlay.classList.toggle("show");
+      });
+
+      sidebarOverlay.addEventListener("click", () => {
+        sidebar.classList.remove("mobile-open");
+        sidebarOverlay.classList.remove("show");
+      });
+
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 900) {
+          sidebar.classList.remove("mobile-open");
+          sidebarOverlay.classList.remove("show");
+        }
+      });
     }
 
     listenMatches((matches) => {
