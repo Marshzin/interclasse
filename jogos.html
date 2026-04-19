@@ -259,12 +259,12 @@
 
   <div class="dashboard">
     <aside class="sidebar" id="sidebar">
-    <div class="logo">
-    <div class="logo-icon">
-      <img src="logo.png" alt="Logo da Escola">
-    </div>
-      <span class="logo-text">INTERCLASSE WP - 2026</span>
-    </div>
+      <div class="logo">
+        <div class="logo-icon">
+          <img src="logo.png" alt="Logo da Escola">
+        </div>
+        <span class="logo-text">INTERCLASSE WP - 2026</span>
+      </div>
 
       <nav class="nav-section">
         <div class="nav-label">Menu Principal</div>
@@ -339,11 +339,18 @@
   </div>
 
   <script src="js/templatemo-crypto-script.js"></script>
-  <script>
+  <script type="module">
+    import { listenMatches } from "./firebase.js";
+
     const FIXED_SPORTS = ["Futsal", "Volei", "Pingpong"];
 
-    function getMatches() {
-      return JSON.parse(localStorage.getItem("interclasse_matches") || "[]");
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     function formatDateBR(dateStr) {
@@ -369,6 +376,7 @@
       panel.classList.toggle("show");
       button.textContent = panel.classList.contains("show") ? "Ocultar eventos" : "Ver eventos";
     }
+    window.toggleEvents = toggleEvents;
 
     function getStatusLabel(status) {
       if (status === "nao_iniciado") return "Não iniciado";
@@ -408,9 +416,9 @@
             return `
               <div class="event-box">
                 <span class="event-tag ${tagClass}">${tagLabel}</span>
-                <p><strong>Participante:</strong> ${event.teamName}</p>
-                <p><strong>Jogador:</strong> ${event.playerNumber ? event.playerNumber + " - " : ""}${event.playerName}</p>
-                <p><strong>Registro:</strong> ${event.createdAt || "Não informado"}</p>
+                <p><strong>Participante:</strong> ${escapeHtml(event.teamName)}</p>
+                <p><strong>Jogador:</strong> ${event.playerNumber ? escapeHtml(event.playerNumber) + " - " : ""}${escapeHtml(event.playerName)}</p>
+                <p><strong>Registro:</strong> ${escapeHtml(event.createdAt || "Não informado")}</p>
               </div>
             `;
           }).join("")}
@@ -418,9 +426,8 @@
       `;
     }
 
-    function renderGames() {
+    function renderGames(matches) {
       const container = document.getElementById("gamesContainer");
-      const matches = getMatches();
 
       let html = "";
 
@@ -436,11 +443,11 @@
 
         html += `
           <div class="games-group" id="${sectionId}">
-            <h2 class="games-title">${sport}</h2>
+            <h2 class="games-title">${escapeHtml(sport)}</h2>
         `;
 
         if (!matchesBySport.length) {
-          html += `<div class="empty-box">Nenhum jogo marcado em ${sport}.</div>`;
+          html += `<div class="empty-box">Nenhum jogo marcado em ${escapeHtml(sport)}.</div>`;
         } else {
           html += `<div class="matches-grid">`;
 
@@ -449,26 +456,26 @@
 
             html += `
               <div class="match-box">
-                <div class="match-meta">${match.sport}</div>
+                <div class="match-meta">${escapeHtml(match.sport)}</div>
                 <div class="status-tag ${getStatusClass(match.status)}">${getStatusLabel(match.status)}</div>
-                <h3>${match.teamAName} x ${match.teamBName}</h3>
+                <h3>${escapeHtml(match.teamAName)} x ${escapeHtml(match.teamBName)}</h3>
                 <p><strong>Data:</strong> ${formatDateBR(match.date)}</p>
-                <p><strong>Horário de início:</strong> ${match.time || "Não informado"}</p>
+                <p><strong>Horário de início:</strong> ${escapeHtml(match.time || "Não informado")}</p>
 
                 <div class="score-line">
-                  <div class="team-name">${match.teamAName}</div>
+                  <div class="team-name">${escapeHtml(match.teamAName)}</div>
                   <div class="score-center">
-                    <span class="score-badge">${match.goalsA || 0}</span>
+                    <span class="score-badge">${Number(match.goalsA || 0)}</span>
                     <span>x</span>
-                    <span class="score-badge">${match.goalsB || 0}</span>
+                    <span class="score-badge">${Number(match.goalsB || 0)}</span>
                   </div>
-                  <div class="team-name">${match.teamBName}</div>
+                  <div class="team-name">${escapeHtml(match.teamBName)}</div>
                 </div>
 
                 <button class="events-toggle-btn" onclick="toggleEvents('${panelId}', this)">Ver eventos</button>
 
                 <div class="events-panel" id="${panelId}">
-                  ${renderEvents(match.events)}
+                  ${renderEvents(match.events || [])}
                 </div>
               </div>
             `;
@@ -483,7 +490,9 @@
       container.innerHTML = html;
     }
 
-    renderGames();
+    listenMatches((matches) => {
+      renderGames(matches);
+    });
   </script>
 </body>
 </html>
