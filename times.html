@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Times - Interclasse</title>
+
+  <link rel="stylesheet" href="css/templatemo-crypto-style.css">
+  <link rel="stylesheet" href="css/templatemo-crypto-pages.css">
+
+  <style>
+    .sidebar .logo-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .custom-active-link {
+      background: linear-gradient(135deg, #b87333, #d49457);
+      color: #fff;
+    }
+
+    .card {
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: 22px;
+    }
+
+    .section-subtitle {
+      margin: 0 0 18px;
+      color: rgba(255,255,255,0.70);
+      line-height: 1.6;
+    }
+
+    .modalities-nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    .modality-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      color: #f2c18d;
+      background: rgba(184,115,51,0.14);
+      border: 1px solid rgba(184,115,51,0.30);
+      transition: 0.25s ease;
+    }
+
+    .modality-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(184,115,51,0.24);
+    }
+
+    .teams-group {
+      margin-top: 28px;
+      scroll-margin-top: 24px;
+    }
+
+    .teams-group-title {
+      margin: 0 0 14px;
+      color: #f2c18d;
+      font-size: 22px;
+    }
+
+    .teams-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .team-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .team-box h3 {
+      margin: 0 0 10px;
+      color: #fff;
+      font-size: 20px;
+    }
+
+    .team-meta {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(184,115,51,0.18);
+      color: #f2c18d;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .team-box p {
+      color: rgba(255,255,255,0.82);
+      margin: 7px 0;
+      line-height: 1.6;
+    }
+
+    .team-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .btn-custom {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.25s ease;
+    }
+
+    .players-btn {
+      background: rgba(184,115,51,0.18);
+      color: #f2c18d;
+      border: 1px solid rgba(184,115,51,0.35);
+    }
+
+    .players-btn:hover {
+      background: rgba(184,115,51,0.28);
+    }
+
+    .players-panel {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .players-panel.show {
+      display: block;
+    }
+
+    .players-panel ul {
+      margin: 0;
+      padding-left: 18px;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.8;
+    }
+
+    .empty-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(255,255,255,0.15);
+      border-radius: 18px;
+      padding: 26px;
+      color: rgba(255,255,255,0.65);
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .admin-link-box {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(184,115,51,0.10);
+      border: 1px solid rgba(184,115,51,0.25);
+      color: rgba(255,255,255,0.85);
+    }
+
+    .admin-link-box a {
+      color: #f2c18d;
+      font-weight: 700;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <button class="mobile-menu-toggle" id="mobileMenuToggle">
+    <div class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </button>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="dashboard">
+    <aside class="sidebar" id="sidebar">
+    <div class="logo">
+    <div class="logo-icon">
+      <img src="logo.png" alt="Logo da Escola">
+    </div>
+      <span class="logo-text">INTERCLASSE WP - 2026</span>
+    </div>
+
+      <nav class="nav-section">
+        <div class="nav-label">Menu Principal</div>
+
+        <a href="index.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+          Início
+        </a>
+
+        <a href="jogos.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          Jogos
+        </a>
+
+        <a href="classificacao.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 3v18h18"></path>
+            <path d="M18 17V9"></path>
+            <path d="M13 17V5"></path>
+            <path d="M8 17v-3"></path>
+          </svg>
+          Classificação
+        </a>
+
+        <a href="times.html" class="nav-item custom-active-link">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          Times
+        </a>
+
+        <a href="administracao.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+          </svg>
+          Administração
+        </a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Times</h1>
+        <p>Visualize as equipes e participantes por modalidade.</p>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Modalidades</h2>
+
+        <div class="modalities-nav">
+          <a href="#mod-futsal" class="modality-btn">Futsal</a>
+          <a href="#mod-volei" class="modality-btn">Volei</a>
+          <a href="#mod-pingpong" class="modality-btn">Pingpong</a>
+        </div>
+
+        <div id="teamsContainer"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/templatemo-crypto-script.js"></script>
+  <script>
+    const FIXED_SPORTS = ["Futsal", "Volei", "Pingpong"];
+
+    function getTeams() {
+      return JSON.parse(localStorage.getItem("times") || "[]");
+    }
+
+    function createSafeId(text) {
+      return "mod-" + text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function buildDisplayName(team) {
+      if (team.sport === "Pingpong") {
+        const first = team.players && team.players[0] ? team.players[0] : null;
+        return first ? first.name : "Jogador";
+      }
+      return team.teamName;
+    }
+
+    function togglePlayers(panelId, button) {
+      const panel = document.getElementById(panelId);
+      if (!panel) return;
+
+      panel.classList.toggle("show");
+      button.textContent = panel.classList.contains("show") ? "Ocultar jogadores" : "Jogadores";
+    }
+
+    function renderPlayersList(players, sport) {
+      if (!players || !players.length) {
+        return "<p>Nenhum jogador informado.</p>";
+      }
+
+      return `
+        <ul>
+          ${players.map(player => {
+            if (sport === "Futsal" && player.number) {
+              return `<li>${player.number} - ${player.name}</li>`;
+            }
+            return `<li>${player.name}</li>`;
+          }).join("")}
+        </ul>
+      `;
+    }
+
+    function renderTeams() {
+      const teamsContainer = document.getElementById("teamsContainer");
+      const teams = getTeams();
+
+      let html = "";
+
+      FIXED_SPORTS.forEach(sport => {
+        const sportId = createSafeId(sport);
+        const sportTeams = teams.filter(team => team.sport === sport);
+
+        html += `
+          <div class="teams-group" id="${sportId}">
+            <h2 class="teams-group-title">${sport}</h2>
+        `;
+
+        if (!sportTeams.length) {
+          html += `<div class="empty-box">Nenhuma equipe cadastrada em ${sport}.</div>`;
+        } else {
+          html += `<div class="teams-grid">`;
+
+          sportTeams.forEach((team, index) => {
+            const globalIndex = `${sport}-${index}`;
+            const playersId = `players-panel-${globalIndex}`;
+            const title = buildDisplayName(team);
+
+            html += `
+              <div class="team-box">
+                <div class="team-meta">${team.sport}</div>
+                <h3>${title}</h3>
+
+                ${team.sport === "Futsal" ? `<p><strong>Capitão:</strong> ${team.captain || "-"}</p>` : ""}
+                ${team.sport === "Volei" ? `<p><strong>Equipe de Volei</strong></p>` : ""}
+                ${team.sport === "Pingpong" ? `<p><strong>Participante individual</strong></p>` : ""}
+                ${team.sport !== "Pingpong" ? `<p><strong>Jogadores cadastrados:</strong> ${team.players ? team.players.length : 0}</p>` : ""}
+                <p><strong>Pontos:</strong> ${team.points || 0}</p>
+
+                <div class="team-actions">
+                  <button class="btn-custom players-btn" onclick="togglePlayers('${playersId}', this)">Jogadores</button>
+                </div>
+
+                <div class="players-panel" id="${playersId}">
+                  ${renderPlayersList(team.players, team.sport)}
+                </div>
+              </div>
+            `;
+          });
+
+          html += `</div>`;
+        }
+
+        html += `</div>`;
+      });
+
+      teamsContainer.innerHTML = html;
+    }
+
+    renderTeams();
+  </script>
+</body>
+</html>

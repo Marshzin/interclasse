@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicial - Interclasse</title>
+
+  <link rel="stylesheet" href="css/templatemo-crypto-style.css">
+  <link rel="stylesheet" href="css/templatemo-crypto-pages.css">
+
+  <style>
+    .sidebar .logo-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .custom-active-link {
+      background: linear-gradient(135deg, #b87333, #d49457);
+      color: #fff;
+    }
+
+    .welcome-card {
+      margin-bottom: 22px;
+    }
+
+    .hero-box {
+      background: linear-gradient(135deg, rgba(184,115,51,0.18), rgba(212,148,87,0.10));
+      border: 1px solid rgba(184,115,51,0.25);
+      border-radius: 22px;
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .hero-box h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      color: #fff;
+    }
+
+    .hero-box p {
+      margin: 0;
+      color: rgba(255,255,255,0.78);
+      line-height: 1.7;
+      max-width: 760px;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: 24px;
+    }
+
+    .section-subtitle {
+      margin: 0 0 18px;
+      color: rgba(255,255,255,0.68);
+      line-height: 1.6;
+    }
+
+    .sports-grid,
+    .actions-grid,
+    .info-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .sports-grid {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .actions-grid,
+    .info-grid {
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .sport-card,
+    .action-card,
+    .info-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 22px;
+    }
+
+    .sport-badge {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(184,115,51,0.18);
+      color: #f2c18d;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .sport-card h3,
+    .action-card h3,
+    .info-card h3 {
+      margin: 0 0 10px;
+      color: #fff;
+      font-size: 20px;
+    }
+
+    .sport-card p,
+    .action-card p,
+    .info-card p {
+      margin: 0;
+      color: rgba(255,255,255,0.74);
+      line-height: 1.7;
+    }
+
+    .quick-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      margin-top: 16px;
+      padding: 11px 16px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, #b87333, #d49457);
+      transition: 0.25s ease;
+    }
+
+    .quick-link:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .card {
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="splash-screen">
+  <img src="logo.png" alt="Logo Interclasse">
+</div>
+
+  <button class="mobile-menu-toggle" id="mobileMenuToggle">
+    <div class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </button>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="dashboard">
+    <aside class="sidebar" id="sidebar">
+    <div class="logo">
+    <div class="logo-icon">
+      <img src="logo.png" alt="Logo da Escola">
+    </div>
+      <span class="logo-text">INTERCLASSE WP - 2026</span>
+    </div>
+
+      <nav class="nav-section">
+        <div class="nav-label">Menu Principal</div>
+
+        <a href="index.html" class="nav-item custom-active-link">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+          Início
+        </a>
+
+        <a href="jogos.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          Jogos
+        </a>
+
+        <a href="classificacao.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 3v18h18"></path>
+            <path d="M18 17V9"></path>
+            <path d="M13 17V5"></path>
+            <path d="M8 17v-3"></path>
+          </svg>
+          Classificação
+        </a>
+
+        <a href="times.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          Times
+        </a>
+
+        <a href="administracao.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+          </svg>
+          Administração
+        </a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="hero-box">
+        <p>
+          Bem-vindo ao portal oficial da Interclasse 2026! Aqui você acompanha as modalidades, confere os jogos, vê a classificação atualizada e conhece as equipes participantes.
+        </p>
+      </div>
+
+      <div class="card welcome-card">
+        <h2 class="section-title">Modalidades Oficiais</h2>
+      
+
+        <div class="sports-grid">
+          <div class="sport-card">
+            <span class="sport-badge">Modalidade</span>
+            <h3>Futsal</h3>
+          </div>
+
+          <div class="sport-card">
+            <span class="sport-badge">Modalidade</span>
+            <h3>Volei</h3>
+          </div>
+
+          <div class="sport-card">
+            <span class="sport-badge">Modalidade</span>
+            <h3>Pingpong</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Acesso Rápido</h2>
+        <p class="section-subtitle">
+          Navegue diretamente para as principais áreas do sistema.
+        </p>
+
+        <div class="actions-grid">
+          <div class="action-card">
+            <h3>Jogos</h3>
+            <a class="quick-link" href="jogos.html">Abrir Jogos</a>
+          </div>
+
+          <div class="action-card">
+            <h3>Classificação</h3>
+            <a class="quick-link" href="classificacao.html">Abrir Classificação</a>
+          </div>
+
+          <div class="action-card">
+            <h3>Times</h3>
+            <a class="quick-link" href="times.html">Abrir Times</a>
+          </div>
+        </div>
+      </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/templatemo-crypto-script.js"></script>
+</body>
+</html>
