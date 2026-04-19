@@ -50,6 +50,10 @@ export function generateSafeKey(team) {
   return sanitizeText(team.teamName || "");
 }
 
+/* =========================
+   TIMES
+========================= */
+
 export async function createTeam(teamData) {
   const payload = {
     sport: sanitizeText(teamData.sport),
@@ -91,12 +95,21 @@ export async function getTeamsOnce() {
 }
 
 export function listenTeams(callback) {
-  const q = query(collection(db, COLLECTIONS.TEAMS), orderBy("sport"), orderBy("teamName"));
+  const q = query(collection(db, COLLECTIONS.TEAMS));
+
   return onSnapshot(q, (snapshot) => {
     const teams = snapshot.docs.map(item => ({
       id: item.id,
       ...item.data()
     }));
+
+    teams.sort((a, b) => {
+      if ((a.sport || "") !== (b.sport || "")) {
+        return (a.sport || "").localeCompare(b.sport || "", "pt-BR");
+      }
+      return generateSafeKey(a).localeCompare(generateSafeKey(b), "pt-BR");
+    });
+
     callback(teams);
   });
 }
@@ -111,6 +124,10 @@ export async function clearAllTeams() {
 
   await batch.commit();
 }
+
+/* =========================
+   JOGOS
+========================= */
 
 export async function createMatch(matchData) {
   const payload = {
@@ -163,6 +180,7 @@ export async function patchMatch(matchId, partialData) {
 
 export async function getMatchById(matchId) {
   const snapshot = await getDoc(doc(db, COLLECTIONS.MATCHES, matchId));
+
   if (!snapshot.exists()) return null;
 
   return {
@@ -184,12 +202,20 @@ export async function getMatchesOnce() {
 }
 
 export function listenMatches(callback) {
-  const q = query(collection(db, COLLECTIONS.MATCHES), orderBy("date"), orderBy("time"));
+  const q = query(collection(db, COLLECTIONS.MATCHES));
+
   return onSnapshot(q, (snapshot) => {
     const matches = snapshot.docs.map(item => ({
       id: item.id,
       ...item.data()
     }));
+
+    matches.sort((a, b) => {
+      const dateTimeA = new Date(`${a.date || "9999-12-31"}T${a.time || "23:59"}`);
+      const dateTimeB = new Date(`${b.date || "9999-12-31"}T${b.time || "23:59"}`);
+      return dateTimeA - dateTimeB;
+    });
+
     callback(matches);
   });
 }
