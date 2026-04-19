@@ -628,10 +628,22 @@
     </div>
   </div>
 
+
   <script src="js/templatemo-crypto-script.js"></script>
-  <script>
-    const TEAM_STORAGE_KEY = "times";
-    const MATCH_STORAGE_KEY = "interclasse_matches";
+  <script type="module">
+    import {
+      createTeam,
+      updateTeam,
+      deleteTeam as deleteTeamDoc,
+      listenTeams,
+      clearAllTeams,
+      createMatch,
+      updateMatch,
+      deleteMatch as deleteMatchDoc,
+      listenMatches,
+      clearAllMatches
+    } from "./firebase.js";
+
     const ADMIN_PASSWORD = "1008";
     const FIXED_SPORTS = ["Futsal", "Volei", "Pingpong"];
 
@@ -659,6 +671,9 @@
       players: document.getElementById("players")
     };
 
+    let teamsCache = [];
+    let matchesCache = [];
+
     function checkAdminPassword() {
       const value = document.getElementById("adminPassword").value.trim();
       const error = document.getElementById("loginError");
@@ -669,6 +684,16 @@
       } else {
         error.style.display = "block";
       }
+    }
+    window.checkAdminPassword = checkAdminPassword;
+
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     function updateTeamFormFields() {
@@ -709,34 +734,16 @@
         playersHelp.textContent = "";
       }
     }
+    window.updateTeamFormFields = updateTeamFormFields;
 
     function showAdminSection(sectionId, button) {
-      document.querySelectorAll(".admin-section").forEach(section => {
-        section.classList.remove("active");
-      });
-      document.querySelectorAll(".admin-tab-btn").forEach(btn => {
-        btn.classList.remove("active");
-      });
+      document.querySelectorAll(".admin-section").forEach(section => section.classList.remove("active"));
+      document.querySelectorAll(".admin-tab-btn").forEach(btn => btn.classList.remove("active"));
 
       document.getElementById(sectionId).classList.add("active");
-      button.classList.add("active");
+      if (button) button.classList.add("active");
     }
-
-    function getTeams() {
-      return JSON.parse(localStorage.getItem(TEAM_STORAGE_KEY) || "[]");
-    }
-
-    function saveTeams(teams) {
-      localStorage.setItem(TEAM_STORAGE_KEY, JSON.stringify(teams));
-    }
-
-    function getMatches() {
-      return JSON.parse(localStorage.getItem(MATCH_STORAGE_KEY) || "[]");
-    }
-
-    function saveMatches(matches) {
-      localStorage.setItem(MATCH_STORAGE_KEY, JSON.stringify(matches));
-    }
+    window.showAdminSection = showAdminSection;
 
     function parsePlayersBySport(text, sport) {
       const lines = text
@@ -761,7 +768,7 @@
     }
 
     function playersToTextarea(players, sport) {
-      return players.map(player => {
+      return (players || []).map(player => {
         if (sport === "Futsal" && player.number) {
           return `${player.number} - ${player.name}`;
         }
@@ -770,11 +777,12 @@
     }
 
     function buildDisplayName(team) {
+      if (!team) return "";
       if (team.sport === "Pingpong") {
         const first = team.players && team.players[0] ? team.players[0] : null;
         return first ? first.name : "Jogador";
       }
-      return team.teamName;
+      return team.teamName || "";
     }
 
     function resetTeamForm() {
@@ -790,49 +798,54 @@
       const panel = document.getElementById(panelId);
       if (!panel) return;
       panel.classList.toggle("show");
-      button.textContent = panel.classList.contains("show") ? "Ocultar jogadores" : "Jogadores";
+      if (button) {
+        const openLabel = button.dataset.openLabel || "Ocultar";
+        const closedLabel = button.dataset.closedLabel || "Jogadores";
+        button.textContent = panel.classList.contains("show") ? openLabel : closedLabel;
+      }
     }
+    window.togglePlayers = togglePlayers;
 
     function renderPlayersList(players) {
-      if (!players.length) return "<p>Nenhum jogador informado.</p>";
-      return `<ul>${players.map(player => `<li>${player.number ? player.number + " - " : ""}${player.name}</li>`).join("")}</ul>`;
+      if (!players || !players.length) return "<p>Nenhum jogador informado.</p>";
+      return `<ul>${players.map(player => `<li>${player.number ? escapeHtml(player.number) + " - " : ""}${escapeHtml(player.name)}</li>`).join("")}</ul>`;
     }
 
     function renderTeams() {
-      const teams = getTeams();
       let html = "";
 
       FIXED_SPORTS.forEach(sport => {
-        const sportTeams = teams.filter(team => team.sport === sport);
-        html += `<h3 class="group-title">${sport}</h3>`;
+        const sportTeams = teamsCache.filter(team => team.sport === sport);
+        html += `<h3 class="group-title">${escapeHtml(sport)}</h3>`;
 
         if (!sportTeams.length) {
-          html += `<div class="empty-box">Nenhuma equipe cadastrada em ${sport}.</div>`;
+          html += `<div class="empty-box">Nenhuma equipe cadastrada em ${escapeHtml(sport)}.</div>`;
           return;
         }
 
         html += `<div class="teams-grid">`;
 
         sportTeams.forEach((team, index) => {
-          const realIndex = teams.findIndex(item => item === team);
-          const playersId = `players-panel-${sport}-${index}`;
+          const playersId = `players-panel-${sport}-${index}-${team.id}`;
           const title = buildDisplayName(team);
 
           html += `
             <div class="team-box">
-              <div class="team-meta">${team.sport}</div>
-              <h3>${title}</h3>
-              ${team.sport === "Futsal" ? `<p><strong>Capitão:</strong> ${team.captain}</p>` : ""}
-              ${team.sport === "Pingpong" ? `<p><strong>Participante individual</strong></p>` : `<p><strong>Jogadores cadastrados:</strong> ${team.players.length}</p>`}
+              <div class="team-meta">${escapeHtml(team.sport)}</div>
+              <h3>${escapeHtml(title)}</h3>
+              ${team.sport === "Futsal" ? `<p><strong>Capitão:</strong> ${escapeHtml(team.captain || "")}</p>` : ""}
+              ${team.sport === "Pingpong"
+                ? `<p><strong>Participante individual</strong></p>`
+                : `<p><strong>Jogadores cadastrados:</strong> ${(team.players || []).length}</p>`}
 
               <div class="team-actions">
-                <button class="btn-custom players-btn" onclick="togglePlayers('${playersId}', this)">Jogadores</button>
-                <button class="btn-custom btn-secondary-custom" onclick="editTeam(${realIndex})">Editar</button>
-                <button class="btn-custom btn-danger-custom" onclick="deleteTeam(${realIndex})">Excluir</button>
+                <button class="btn-custom players-btn" data-open-label="Ocultar jogadores" data-closed-label="Jogadores" onclick="togglePlayers('${playersId}', this)">Jogadores</button>
+                <button class="btn-custom btn-secondary-custom" onclick="editTeam('${team.id}')">Editar</button>
+                <button class="btn-custom btn-danger-custom" onclick="deleteTeam('${team.id}')">Excluir</button>
               </div>
 
               <div class="players-panel" id="${playersId}">
-                ${renderPlayersList(team.players)}
+                ${renderPlayersList(team.players || [])}
               </div>
             </div>
           `;
@@ -844,35 +857,34 @@
       teamsContainer.innerHTML = html;
     }
 
-    function editTeam(index) {
-      const teams = getTeams();
-      const team = teams[index];
+    async function editTeam(teamId) {
+      const team = teamsCache.find(item => item.id === teamId);
       if (!team) return;
 
-      editIndexInput.value = index;
+      editIndexInput.value = teamId;
       fields.sport.value = team.sport;
       updateTeamFormFields();
 
       fields.teamName.value = team.teamName || "";
       fields.captain.value = team.captain || "";
-      fields.players.value = playersToTextarea(team.players, team.sport);
+      fields.players.value = playersToTextarea(team.players || [], team.sport);
 
       formTitle.textContent = "Editar equipe";
       saveButton.textContent = "Atualizar equipe";
       cancelEditButton.style.display = "inline-block";
 
-      showAdminSection("criar-times", document.querySelectorAll(".admin-tab-btn")[0]);
+      const firstTab = document.querySelectorAll(".admin-tab-btn")[0];
+      showAdminSection("criar-times", firstTab);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+    window.editTeam = editTeam;
 
-    function deleteTeam(index) {
-      const teams = getTeams();
-      const team = teams[index];
+    async function deleteTeam(teamId) {
+      const team = teamsCache.find(item => item.id === teamId);
       if (!team) return;
 
       const teamKey = buildDisplayName(team);
-      const matches = getMatches();
-      const relatedMatches = matches.filter(match =>
+      const relatedMatches = matchesCache.filter(match =>
         match.teamAKey === teamKey || match.teamBKey === teamKey
       );
 
@@ -883,18 +895,17 @@
 
       if (!confirm("Deseja excluir esta equipe?")) return;
 
-      teams.splice(index, 1);
-      saveTeams(teams);
-      renderTeams();
-      renderMatches();
-      resetTeamForm();
+      await deleteTeamDoc(teamId);
+      if (editIndexInput.value === teamId) {
+        resetTeamForm();
+      }
     }
+    window.deleteTeam = deleteTeam;
 
-    teamForm.addEventListener("submit", function (event) {
+    teamForm.addEventListener("submit", async function (event) {
       event.preventDefault();
 
-      const teams = getTeams();
-      const editIndex = Number(editIndexInput.value);
+      const editId = editIndexInput.value;
       const sport = fields.sport.value;
       const players = parsePlayersBySport(fields.players.value, sport);
 
@@ -923,59 +934,70 @@
         players
       };
 
-      if (editIndex >= 0) {
-        const previous = teams[editIndex];
+      if (editId && editId !== "-1") {
+        const previous = teamsCache.find(item => item.id === editId);
         const previousKey = buildDisplayName(previous);
         const newKey = buildDisplayName(teamData);
 
-        teams[editIndex] = teamData;
+        await updateTeam(editId, teamData);
 
-        const matches = getMatches().map(match => {
-          if (match.teamAKey === previousKey && match.sport === previous.sport) {
-            match.teamAKey = newKey;
-            match.teamAName = newKey;
-            match.sport = teamData.sport;
+        if (previous && (previousKey !== newKey || previous.sport !== teamData.sport)) {
+          const relatedMatches = matchesCache.filter(match =>
+            (match.teamAKey === previousKey || match.teamBKey === previousKey) && match.sport === previous.sport
+          );
+
+          for (const match of relatedMatches) {
+            const updated = {
+              sport: teamData.sport,
+              teamAKey: match.teamAKey,
+              teamBKey: match.teamBKey,
+              teamAName: match.teamAName,
+              teamBName: match.teamBName,
+              date: match.date,
+              time: match.time,
+              goalsA: Number(match.goalsA) || 0,
+              goalsB: Number(match.goalsB) || 0,
+              status: match.status || "nao_iniciado",
+              events: Array.isArray(match.events) ? match.events : []
+            };
+
+            if (match.teamAKey === previousKey) {
+              updated.teamAKey = newKey;
+              updated.teamAName = newKey;
+            }
+            if (match.teamBKey === previousKey) {
+              updated.teamBKey = newKey;
+              updated.teamBName = newKey;
+            }
+
+            await updateMatch(match.id, updated);
           }
-          if (match.teamBKey === previousKey && match.sport === previous.sport) {
-            match.teamBKey = newKey;
-            match.teamBName = newKey;
-            match.sport = teamData.sport;
-          }
-          return match;
-        });
-        saveMatches(matches);
+        }
       } else {
-        teams.push(teamData);
+        await createTeam(teamData);
       }
 
-      saveTeams(teams);
-      renderTeams();
-      renderMatches();
       resetTeamForm();
     });
 
     cancelEditButton.addEventListener("click", resetTeamForm);
 
-    clearAllTeamsButton.addEventListener("click", function () {
-      const teams = getTeams();
-      const matches = getMatches();
-
-      if (matches.length) {
+    clearAllTeamsButton.addEventListener("click", async function () {
+      if (matchesCache.length) {
         alert("Apague primeiro os jogos cadastrados antes de apagar todas as equipes.");
         return;
       }
 
-      if (!teams.length) return;
+      if (!teamsCache.length) return;
 
       if (confirm("Deseja apagar todas as equipes cadastradas?")) {
-        localStorage.removeItem(TEAM_STORAGE_KEY);
-        renderTeams();
+        await clearAllTeams();
         resetTeamForm();
       }
     });
 
     function getTeamsBySport(sport) {
-      return getTeams().filter(team => team.sport === sport);
+      return teamsCache.filter(team => team.sport === sport);
     }
 
     function populateParticipantsBySport() {
@@ -1005,10 +1027,11 @@
       if ([...teamASelect.options].some(opt => opt.value === currentA)) teamASelect.value = currentA;
       if ([...teamBSelect.options].some(opt => opt.value === currentB)) teamBSelect.value = currentB;
     }
+    window.populateParticipantsBySport = populateParticipantsBySport;
 
     matchSport.addEventListener("change", populateParticipantsBySport);
 
-    matchForm.addEventListener("submit", function (event) {
+    matchForm.addEventListener("submit", async function (event) {
       event.preventDefault();
 
       const sport = matchSport.value;
@@ -1018,14 +1041,13 @@
       const matchTime = matchTimeInput.value;
 
       if (!sport || !teamAName || !teamBName || !matchDate || !matchTime) return;
+
       if (teamAName === teamBName) {
         alert("Selecione participantes diferentes.");
         return;
       }
 
-      const matches = getMatches();
-      matches.push({
-        id: Date.now(),
+      await createMatch({
         sport,
         teamAKey: teamAName,
         teamBKey: teamBName,
@@ -1039,25 +1061,20 @@
         events: []
       });
 
-      saveMatches(matches);
       matchForm.reset();
       populateParticipantsBySport();
-      renderMatches();
     });
 
-    clearAllMatchesButton.addEventListener("click", function () {
-      const matches = getMatches();
-      if (!matches.length) return;
+    clearAllMatchesButton.addEventListener("click", async function () {
+      if (!matchesCache.length) return;
 
       if (confirm("Deseja apagar todos os jogos cadastrados?")) {
-        localStorage.removeItem(MATCH_STORAGE_KEY);
-        recalculateTeamPoints();
-        renderMatches();
+        await clearAllMatches();
       }
     });
 
     function getTeamByKey(key) {
-      return getTeams().find(team => buildDisplayName(team) === key);
+      return teamsCache.find(team => buildDisplayName(team) === key);
     }
 
     function openMatchManagePanel(matchId, button) {
@@ -1065,12 +1082,14 @@
       if (!panel) return;
 
       panel.classList.toggle("show");
-      button.textContent = panel.classList.contains("show") ? "Fechar gestão" : "Gerenciar jogo";
+      if (button) {
+        button.textContent = panel.classList.contains("show") ? "Fechar gestão" : "Gerenciar jogo";
+      }
     }
+    window.openMatchManagePanel = openMatchManagePanel;
 
     function updatePlayerSelect(matchId) {
-      const matches = getMatches();
-      const match = matches.find(item => item.id === matchId);
+      const match = matchesCache.find(item => item.id === matchId);
       if (!match) return;
 
       const eventTeamSelect = document.getElementById(`event-team-${matchId}`);
@@ -1081,17 +1100,17 @@
       eventPlayerSelect.innerHTML = `<option value="">Selecione</option>`;
       if (!team) return;
 
-      team.players.forEach(player => {
+      (team.players || []).forEach(player => {
         const option = document.createElement("option");
         option.value = player.name;
         option.textContent = `${player.number ? player.number + " - " : ""}${player.name}`;
         eventPlayerSelect.appendChild(option);
       });
     }
+    window.updatePlayerSelect = updatePlayerSelect;
 
-    function addEventToMatch(matchId) {
-      const matches = getMatches();
-      const match = matches.find(item => item.id === matchId);
+    async function addEventToMatch(matchId) {
+      const match = matchesCache.find(item => item.id === matchId);
       if (!match || match.status === "finalizado") return;
 
       const eventTeamSelect = document.getElementById(`event-team-${matchId}`);
@@ -1108,9 +1127,23 @@
       }
 
       const team = getTeamByKey(teamName);
-      const player = team ? team.players.find(item => item.name === playerName) : null;
+      const player = team ? (team.players || []).find(item => item.name === playerName) : null;
 
-      match.events.push({
+      const updated = {
+        sport: match.sport,
+        teamAKey: match.teamAKey,
+        teamBKey: match.teamBKey,
+        teamAName: match.teamAName,
+        teamBName: match.teamBName,
+        date: match.date,
+        time: match.time,
+        goalsA: Number(match.goalsA) || 0,
+        goalsB: Number(match.goalsB) || 0,
+        status: match.status || "nao_iniciado",
+        events: Array.isArray(match.events) ? [...match.events] : []
+      };
+
+      updated.events.push({
         type: eventType,
         teamName,
         playerName,
@@ -1119,61 +1152,44 @@
       });
 
       if (eventType === "goal") {
-        if (teamName === match.teamAKey) match.goalsA += 1;
-        else match.goalsB += 1;
+        if (teamName === updated.teamAKey) updated.goalsA += 1;
+        else updated.goalsB += 1;
       }
 
-      saveMatches(matches);
-      renderMatches();
+      await updateMatch(matchId, updated);
     }
+    window.addEventToMatch = addEventToMatch;
 
-    function setMatchStatus(matchId, newStatus) {
-      const matches = getMatches();
-      const match = matches.find(item => item.id === matchId);
+    async function setMatchStatus(matchId, newStatus) {
+      const match = matchesCache.find(item => item.id === matchId);
       if (!match) return;
 
-      match.status = newStatus;
-      saveMatches(matches);
-      recalculateTeamPoints();
-      renderMatches();
-    }
+      const updated = {
+        sport: match.sport,
+        teamAKey: match.teamAKey,
+        teamBKey: match.teamBKey,
+        teamAName: match.teamAName,
+        teamBName: match.teamBName,
+        date: match.date,
+        time: match.time,
+        goalsA: Number(match.goalsA) || 0,
+        goalsB: Number(match.goalsB) || 0,
+        status: newStatus,
+        events: Array.isArray(match.events) ? match.events : []
+      };
 
-    function deleteMatch(matchId) {
-      let matches = getMatches();
+      await updateMatch(matchId, updated);
+    }
+    window.setMatchStatus = setMatchStatus;
+
+    async function deleteMatch(matchId) {
       if (!confirm("Deseja excluir este jogo?")) return;
-
-      matches = matches.filter(item => item.id !== matchId);
-      saveMatches(matches);
-      recalculateTeamPoints();
-      renderMatches();
+      await deleteMatchDoc(matchId);
     }
-
-    function recalculateTeamPoints() {
-      const teams = getTeams();
-      const matches = getMatches();
-
-      teams.forEach(team => {
-        team.points = 0;
-      });
-
-      matches.filter(match => match.status === "finalizado").forEach(match => {
-        const teamA = getTeamByKey(match.teamAKey);
-        const teamB = getTeamByKey(match.teamBKey);
-        if (!teamA || !teamB) return;
-
-        if (match.goalsA > match.goalsB) {
-          teamA.points += 1;
-        } else if (match.goalsB > match.goalsA) {
-          teamB.points += 1;
-        }
-      });
-
-      saveTeams(teams);
-      renderTeams();
-    }
+    window.deleteMatch = deleteMatch;
 
     function renderEvents(events) {
-      if (!events.length) {
+      if (!events || !events.length) {
         return `<div class="empty-box">Nenhum evento registrado neste jogo.</div>`;
       }
 
@@ -1194,9 +1210,9 @@
             return `
               <div class="event-box">
                 <span class="event-tag ${tagClass}">${tagLabel}</span>
-                <p><strong>Participante:</strong> ${event.teamName}</p>
-                <p><strong>Jogador:</strong> ${event.playerNumber ? event.playerNumber + " - " : ""}${event.playerName}</p>
-                <p><strong>Registro:</strong> ${event.createdAt}</p>
+                <p><strong>Participante:</strong> ${escapeHtml(event.teamName)}</p>
+                <p><strong>Jogador:</strong> ${event.playerNumber ? escapeHtml(event.playerNumber) + " - " : ""}${escapeHtml(event.playerName)}</p>
+                <p><strong>Registro:</strong> ${escapeHtml(event.createdAt)}</p>
               </div>
             `;
           }).join("")}
@@ -1228,15 +1244,14 @@
     }
 
     function renderMatches() {
-      const matches = getMatches();
       let html = "";
 
       FIXED_SPORTS.forEach(sport => {
-        const sportMatches = matches.filter(match => match.sport === sport);
-        html += `<h3 class="group-title">${sport}</h3>`;
+        const sportMatches = matchesCache.filter(match => match.sport === sport);
+        html += `<h3 class="group-title">${escapeHtml(sport)}</h3>`;
 
         if (!sportMatches.length) {
-          html += `<div class="empty-box">Nenhum jogo cadastrado em ${sport}.</div>`;
+          html += `<div class="empty-box">Nenhum jogo cadastrado em ${escapeHtml(sport)}.</div>`;
           return;
         }
 
@@ -1249,41 +1264,41 @@
 
           html += `
             <div class="match-box">
-              <div class="match-meta">${match.sport}</div>
+              <div class="match-meta">${escapeHtml(match.sport)}</div>
               <div class="status-tag ${getStatusClass(match.status)}">${getStatusLabel(match.status)}</div>
-              <h3>${match.teamAName} x ${match.teamBName}</h3>
+              <h3>${escapeHtml(match.teamAName)} x ${escapeHtml(match.teamBName)}</h3>
               <p><strong>Data:</strong> ${formatDateBR(match.date)}</p>
-              <p><strong>Horário de início:</strong> ${match.time || "Não informado"}</p>
+              <p><strong>Horário de início:</strong> ${escapeHtml(match.time || "Não informado")}</p>
 
               <div class="score-line">
-                <span>${match.teamAName}</span>
-                <span class="score-badge">${match.goalsA}</span>
+                <span>${escapeHtml(match.teamAName)}</span>
+                <span class="score-badge">${Number(match.goalsA) || 0}</span>
                 <span>x</span>
-                <span class="score-badge">${match.goalsB}</span>
-                <span>${match.teamBName}</span>
+                <span class="score-badge">${Number(match.goalsB) || 0}</span>
+                <span>${escapeHtml(match.teamBName)}</span>
               </div>
 
               <div class="match-actions">
-                <button class="btn-custom btn-secondary-custom" onclick="openMatchManagePanel(${match.id}, this)">Gerenciar jogo</button>
-                <button class="btn-custom players-btn" onclick="togglePlayers('${panelId}', this)">Eventos</button>
-                <button class="btn-custom btn-danger-custom" onclick="deleteMatch(${match.id})">Excluir jogo</button>
+                <button class="btn-custom btn-secondary-custom" onclick="openMatchManagePanel('${match.id}', this)">Gerenciar jogo</button>
+                <button class="btn-custom players-btn" data-open-label="Ocultar eventos" data-closed-label="Eventos" onclick="togglePlayers('${panelId}', this)">Eventos</button>
+                <button class="btn-custom btn-danger-custom" onclick="deleteMatch('${match.id}')">Excluir jogo</button>
               </div>
 
               <div class="match-management-panel" id="${managePanelId}">
                 <div class="btn-row-custom">
-                  <button class="btn-custom btn-secondary-custom" onclick="setMatchStatus(${match.id}, 'nao_iniciado')">Não iniciado</button>
-                  <button class="btn-custom btn-warning-custom" onclick="setMatchStatus(${match.id}, 'andamento')">Iniciar jogo</button>
-                  <button class="btn-custom players-btn" onclick="setMatchStatus(${match.id}, 'intervalo')">Intervalo</button>
-                  <button class="btn-custom btn-success-custom" onclick="setMatchStatus(${match.id}, 'finalizado')">Finalizar</button>
+                  <button class="btn-custom btn-secondary-custom" onclick="setMatchStatus('${match.id}', 'nao_iniciado')">Não iniciado</button>
+                  <button class="btn-custom btn-warning-custom" onclick="setMatchStatus('${match.id}', 'andamento')">Iniciar jogo</button>
+                  <button class="btn-custom players-btn" onclick="setMatchStatus('${match.id}', 'intervalo')">Intervalo</button>
+                  <button class="btn-custom btn-success-custom" onclick="setMatchStatus('${match.id}', 'finalizado')">Finalizar</button>
                 </div>
 
                 <div class="mini-form-grid">
                   <div class="form-group-custom">
                     <label class="form-label-custom" for="event-team-${match.id}">Participante</label>
-                    <select class="form-select-custom" id="event-team-${match.id}" onchange="updatePlayerSelect(${match.id})" ${isFinalized ? "disabled" : ""}>
+                    <select class="form-select-custom" id="event-team-${match.id}" onchange="updatePlayerSelect('${match.id}')" ${isFinalized ? "disabled" : ""}>
                       <option value="">Selecione</option>
-                      <option value="${match.teamAKey}">${match.teamAName}</option>
-                      <option value="${match.teamBKey}">${match.teamBName}</option>
+                      <option value="${escapeHtml(match.teamAKey)}">${escapeHtml(match.teamAName)}</option>
+                      <option value="${escapeHtml(match.teamBKey)}">${escapeHtml(match.teamBName)}</option>
                     </select>
                   </div>
 
@@ -1306,12 +1321,12 @@
                 </div>
 
                 <div class="btn-row-custom">
-                  <button class="btn-custom btn-success-custom" onclick="addEventToMatch(${match.id})" ${isFinalized ? "disabled" : ""}>Adicionar evento</button>
+                  <button class="btn-custom btn-success-custom" onclick="addEventToMatch('${match.id}')" ${isFinalized ? "disabled" : ""}>Adicionar evento</button>
                 </div>
               </div>
 
               <div class="players-panel" id="${panelId}">
-                ${renderEvents(match.events)}
+                ${renderEvents(match.events || [])}
               </div>
             </div>
           `;
@@ -1324,8 +1339,19 @@
     }
 
     updateTeamFormFields();
-    renderTeams();
-    renderMatches();
+    resetTeamForm();
+    populateParticipantsBySport();
+
+    listenTeams((teams) => {
+      teamsCache = [...teams];
+      renderTeams();
+      populateParticipantsBySport();
+    });
+
+    listenMatches((matches) => {
+      matchesCache = [...matches];
+      renderMatches();
+    });
   </script>
 </body>
 </html>
