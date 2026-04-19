@@ -23,7 +23,8 @@
     }
 
     .hero-card,
-    .quick-card {
+    .quick-card,
+    .info-card {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 18px;
@@ -45,7 +46,7 @@
 
     .quick-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(220px, 1fr));
+      grid-template-columns: repeat(3, minmax(220px, 1fr));
       gap: 18px;
       margin-top: 16px;
     }
@@ -76,6 +77,80 @@
       margin: 0;
       color: rgba(255,255,255,0.76);
       line-height: 1.6;
+    }
+
+    .welcome-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+    }
+
+    .highlight-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(184,115,51,0.10), rgba(212,148,87,0.06));
+      border: 1px solid rgba(184,115,51,0.20);
+      text-align: center;
+      padding: 20px;
+    }
+
+    .highlight-box h2 {
+      margin: 0;
+      color: #fff;
+      font-size: 28px;
+      line-height: 1.3;
+    }
+
+    .info-title {
+      margin: 0 0 10px;
+      color: #fff;
+      font-size: 22px;
+    }
+
+    .info-text {
+      margin: 0;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.7;
+    }
+
+    .splash-screen {
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .splash-screen.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-logo-box {
+      text-align: center;
+      padding: 24px;
+    }
+
+    .splash-logo-box img {
+      max-width: 220px;
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto 14px;
+    }
+
+    .splash-logo-box p {
+      margin: 0;
+      color: #333;
+      font-weight: 700;
+      letter-spacing: 0.4px;
     }
 
     @media (max-width: 900px) {
@@ -130,13 +205,29 @@
         box-sizing: border-box;
       }
 
+      .welcome-grid,
       .quick-grid {
         grid-template-columns: 1fr;
+      }
+
+      .hero-title {
+        font-size: 26px;
+      }
+
+      .highlight-box h2 {
+        font-size: 24px;
       }
     }
   </style>
 </head>
 <body>
+  <div class="splash-screen" id="splashScreen">
+    <div class="splash-logo-box">
+      <img src="logo.png" alt="Logo da Escola">
+      <p>INTERCLASSE WP - 2026</p>
+    </div>
+  </div>
+
   <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" onclick="toggleMobileMenu()">
     <div class="hamburger">
       <span></span>
@@ -208,36 +299,45 @@
 
     <main class="main-content">
       <div class="hero-card">
-        <h1 class="hero-title">Interclasse WP - 2026</h1>
+        <h1 class="hero-title">Bem-vindos ao Interclasse WP - 2026</h1>
         <p class="hero-text">
-          Acompanhe os jogos, a classificação e os times do campeonato interclasse em um só lugar.
+          Acompanhe os jogos, confira a classificação e visualize os times participantes do campeonato interclasse.
         </p>
       </div>
 
-      <div class="quick-card">
-        <h2 style="margin:0; color:#fff;">Acesso rápido</h2>
+      <div class="welcome-grid">
+        <div class="quick-card">
+          <h2 style="margin:0; color:#fff;">Acesso rápido</h2>
 
-        <div class="quick-grid">
-          <a href="jogos.html" class="quick-link">
-            <h3>Jogos</h3>
-            <p>Veja datas, horários, placares e eventos de cada partida.</p>
-          </a>
+          <div class="quick-grid">
+            <a href="jogos.html" class="quick-link">
+              <h3>Jogos</h3>
+              <p>Veja datas, horários, placares e eventos das partidas.</p>
+            </a>
 
-          <a href="classificacao.html" class="quick-link">
-            <h3>Classificação</h3>
-            <p>Confira a posição das equipes por modalidade.</p>
-          </a>
+            <a href="classificacao.html" class="quick-link">
+              <h3>Classificação</h3>
+              <p>Confira a colocação das equipes por modalidade.</p>
+            </a>
 
-          <a href="times.html" class="quick-link">
-            <h3>Times</h3>
-            <p>Visualize os participantes e equipes cadastradas.</p>
-          </a>
-
-          <a href="administracao.html" class="quick-link">
-            <h3>Administração</h3>
-            <p>Cadastre equipes, jogos e gerencie o interclasse.</p>
-          </a>
+            <a href="times.html" class="quick-link">
+              <h3>Times</h3>
+              <p>Visualize as equipes e os participantes cadastrados.</p>
+            </a>
+          </div>
         </div>
+
+        <div class="highlight-box">
+          <h2>Esporte, união e competição<br>em um só lugar.</h2>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h2 class="info-title">Acompanhe tudo pelo sistema</h2>
+        <p class="info-text">
+          O portal do Interclasse WP foi organizado para facilitar o acompanhamento do campeonato,
+          permitindo visualizar rapidamente os confrontos, a pontuação e os participantes de cada modalidade.
+        </p>
       </div>
     </main>
   </div>
@@ -256,6 +356,7 @@
     document.addEventListener("DOMContentLoaded", function () {
       const overlay = document.getElementById("sidebarOverlay");
       const sidebar = document.getElementById("sidebar");
+      const splash = document.getElementById("splashScreen");
 
       if (overlay && sidebar) {
         overlay.addEventListener("click", function () {
@@ -279,6 +380,10 @@
           overlay.classList.remove("show");
         }
       });
+
+      setTimeout(() => {
+        if (splash) splash.classList.add("hide");
+      }, 1400);
     });
   </script>
 </body>
