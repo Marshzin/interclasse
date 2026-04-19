@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inicial - Interclasse</title>
+  <title>Interclasse WP - 2026</title>
 
   <link rel="stylesheet" href="css/templatemo-crypto-style.css">
   <link rel="stylesheet" href="css/templatemo-crypto-pages.css">
@@ -22,127 +22,122 @@
       color: #fff;
     }
 
-    .welcome-card {
+    .hero-card,
+    .quick-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 22px;
       margin-bottom: 22px;
     }
 
-    .hero-box {
-      background: linear-gradient(135deg, rgba(184,115,51,0.18), rgba(212,148,87,0.10));
-      border: 1px solid rgba(184,115,51,0.25);
-      border-radius: 22px;
-      padding: 28px;
-      margin-bottom: 24px;
-    }
-
-    .hero-box h1 {
+    .hero-title {
       margin: 0 0 10px;
-      font-size: 34px;
       color: #fff;
+      font-size: 30px;
     }
 
-    .hero-box p {
+    .hero-text {
       margin: 0;
       color: rgba(255,255,255,0.78);
       line-height: 1.7;
-      max-width: 760px;
     }
 
-    .section-title {
-      margin: 0 0 8px;
-      color: #fff;
-      font-size: 24px;
-    }
-
-    .section-subtitle {
-      margin: 0 0 18px;
-      color: rgba(255,255,255,0.68);
-      line-height: 1.6;
-    }
-
-    .sports-grid,
-    .actions-grid,
-    .info-grid {
+    .quick-grid {
       display: grid;
+      grid-template-columns: repeat(2, minmax(220px, 1fr));
       gap: 18px;
-    }
-
-    .sports-grid {
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
-
-    .actions-grid,
-    .info-grid {
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    }
-
-    .sport-card,
-    .action-card,
-    .info-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 22px;
-    }
-
-    .sport-badge {
-      display: inline-block;
-      margin-bottom: 12px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(184,115,51,0.18);
-      color: #f2c18d;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .sport-card h3,
-    .action-card h3,
-    .info-card h3 {
-      margin: 0 0 10px;
-      color: #fff;
-      font-size: 20px;
-    }
-
-    .sport-card p,
-    .action-card p,
-    .info-card p {
-      margin: 0;
-      color: rgba(255,255,255,0.74);
-      line-height: 1.7;
+      margin-top: 16px;
     }
 
     .quick-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      display: block;
       text-decoration: none;
-      margin-top: 16px;
-      padding: 11px 16px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 700;
+      border-radius: 18px;
+      padding: 20px;
+      background: rgba(184,115,51,0.10);
+      border: 1px solid rgba(184,115,51,0.25);
       color: #fff;
-      background: linear-gradient(135deg, #b87333, #d49457);
       transition: 0.25s ease;
     }
 
     .quick-link:hover {
-      transform: translateY(-1px);
-      opacity: 0.96;
+      transform: translateY(-2px);
+      background: rgba(184,115,51,0.16);
     }
 
-    .card {
-      margin-bottom: 24px;
+    .quick-link h3 {
+      margin: 0 0 8px;
+      color: #f2c18d;
+      font-size: 20px;
+    }
+
+    .quick-link p {
+      margin: 0;
+      color: rgba(255,255,255,0.76);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 280px !important;
+        height: 100vh !important;
+        z-index: 10001 !important;
+        overflow-y: auto !important;
+        background: #151821 !important;
+        transform: translateX(-110%) !important;
+        transition: transform 0.3s ease !important;
+        will-change: transform;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+
+      .sidebar.mobile-open {
+        transform: translateX(0) !important;
+      }
+
+      .sidebar-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        background: rgba(0, 0, 0, 0.45) !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        z-index: 10000 !important;
+        transition: opacity 0.3s ease, visibility 0.3s ease !important;
+        display: block !important;
+      }
+
+      .sidebar-overlay.show {
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+
+      .mobile-menu-toggle {
+        position: fixed !important;
+        top: 14px !important;
+        left: 14px !important;
+        z-index: 10002 !important;
+        display: flex !important;
+      }
+
+      .main-content {
+        width: 100% !important;
+        padding-top: 76px !important;
+        box-sizing: border-box;
+      }
+
+      .quick-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-
-<div class="splash-screen">
-  <img src="logo.png" alt="Logo Interclasse">
-</div>
-
-  <button class="mobile-menu-toggle" id="mobileMenuToggle">
+  <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" onclick="toggleMobileMenu()">
     <div class="hamburger">
       <span></span>
       <span></span>
@@ -154,12 +149,12 @@
 
   <div class="dashboard">
     <aside class="sidebar" id="sidebar">
-    <div class="logo">
-    <div class="logo-icon">
-      <img src="logo.png" alt="Logo da Escola">
-    </div>
-      <span class="logo-text">INTERCLASSE WP - 2026</span>
-    </div>
+      <div class="logo">
+        <div class="logo-icon">
+          <img src="logo.png" alt="Logo da Escola">
+        </div>
+        <span class="logo-text">INTERCLASSE WP - 2026</span>
+      </div>
 
       <nav class="nav-section">
         <div class="nav-label">Menu Principal</div>
@@ -212,63 +207,79 @@
     </aside>
 
     <main class="main-content">
-      <div class="hero-box">
-        <p>
-          Bem-vindo ao portal oficial da Interclasse 2026! Aqui você acompanha as modalidades, confere os jogos, vê a classificação atualizada e conhece as equipes participantes.
+      <div class="hero-card">
+        <h1 class="hero-title">Interclasse WP - 2026</h1>
+        <p class="hero-text">
+          Acompanhe os jogos, a classificação e os times do campeonato interclasse em um só lugar.
         </p>
       </div>
 
-      <div class="card welcome-card">
-        <h2 class="section-title">Modalidades Oficiais</h2>
-      
+      <div class="quick-card">
+        <h2 style="margin:0; color:#fff;">Acesso rápido</h2>
 
-        <div class="sports-grid">
-          <div class="sport-card">
-            <span class="sport-badge">Modalidade</span>
-            <h3>Futsal</h3>
-          </div>
-
-          <div class="sport-card">
-            <span class="sport-badge">Modalidade</span>
-            <h3>Volei</h3>
-          </div>
-
-          <div class="sport-card">
-            <span class="sport-badge">Modalidade</span>
-            <h3>Pingpong</h3>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2 class="section-title">Acesso Rápido</h2>
-        <p class="section-subtitle">
-          Navegue diretamente para as principais áreas do sistema.
-        </p>
-
-        <div class="actions-grid">
-          <div class="action-card">
+        <div class="quick-grid">
+          <a href="jogos.html" class="quick-link">
             <h3>Jogos</h3>
-            <a class="quick-link" href="jogos.html">Abrir Jogos</a>
-          </div>
+            <p>Veja datas, horários, placares e eventos de cada partida.</p>
+          </a>
 
-          <div class="action-card">
+          <a href="classificacao.html" class="quick-link">
             <h3>Classificação</h3>
-            <a class="quick-link" href="classificacao.html">Abrir Classificação</a>
-          </div>
+            <p>Confira a posição das equipes por modalidade.</p>
+          </a>
 
-          <div class="action-card">
+          <a href="times.html" class="quick-link">
             <h3>Times</h3>
-            <a class="quick-link" href="times.html">Abrir Times</a>
-          </div>
-        </div>
-      </div>
+            <p>Visualize os participantes e equipes cadastradas.</p>
+          </a>
 
+          <a href="administracao.html" class="quick-link">
+            <h3>Administração</h3>
+            <p>Cadastre equipes, jogos e gerencie o interclasse.</p>
+          </a>
         </div>
       </div>
     </main>
   </div>
 
   <script src="js/templatemo-crypto-script.js"></script>
+  <script>
+    function toggleMobileMenu() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+      if (!sidebar || !overlay) return;
+
+      sidebar.classList.toggle("mobile-open");
+      overlay.classList.toggle("show");
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const overlay = document.getElementById("sidebarOverlay");
+      const sidebar = document.getElementById("sidebar");
+
+      if (overlay && sidebar) {
+        overlay.addEventListener("click", function () {
+          sidebar.classList.remove("mobile-open");
+          overlay.classList.remove("show");
+        });
+      }
+
+      document.querySelectorAll(".sidebar .nav-item").forEach(item => {
+        item.addEventListener("click", function () {
+          if (sidebar && overlay) {
+            sidebar.classList.remove("mobile-open");
+            overlay.classList.remove("show");
+          }
+        });
+      });
+
+      window.addEventListener("resize", function () {
+        if (window.innerWidth > 900 && sidebar && overlay) {
+          sidebar.classList.remove("mobile-open");
+          overlay.classList.remove("show");
+        }
+      });
+    });
+  </script>
 </body>
 </html>
