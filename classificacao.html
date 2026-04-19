@@ -133,12 +133,12 @@
 
   <div class="dashboard">
     <aside class="sidebar" id="sidebar">
-    <div class="logo">
-    <div class="logo-icon">
-      <img src="logo.png" alt="Logo da Escola">
-    </div>
-      <span class="logo-text">INTERCLASSE WP - 2026</span>
-    </div>
+      <div class="logo">
+        <div class="logo-icon">
+          <img src="logo.png" alt="Logo da Escola">
+        </div>
+        <span class="logo-text">INTERCLASSE WP - 2026</span>
+      </div>
 
       <nav class="nav-section">
         <div class="nav-label">Menu Principal</div>
@@ -212,15 +212,20 @@
   </div>
 
   <script src="js/templatemo-crypto-script.js"></script>
-  <script>
+  <script type="module">
+    import { listenTeams, listenMatches } from "./firebase.js";
+
     const FIXED_SPORTS = ["Futsal", "Volei", "Pingpong"];
+    let teamsCache = [];
+    let matchesCache = [];
 
-    function getTeams() {
-      return JSON.parse(localStorage.getItem("times") || "[]");
-    }
-
-    function getMatches() {
-      return JSON.parse(localStorage.getItem("interclasse_matches") || "[]");
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     function createSafeId(text) {
@@ -237,20 +242,17 @@
         const first = team.players && team.players[0] ? team.players[0] : null;
         return first ? first.name : "Jogador";
       }
-      return team.teamName;
+      return team.teamName || "Equipe";
     }
 
     function buildClassificationData() {
-      const teams = getTeams();
-      const matches = getMatches();
-
       const classification = {};
 
       FIXED_SPORTS.forEach(sport => {
         classification[sport] = [];
       });
 
-      teams.forEach(team => {
+      teamsCache.forEach(team => {
         if (!classification[team.sport]) {
           classification[team.sport] = [];
         }
@@ -267,7 +269,7 @@
         });
       });
 
-      matches
+      matchesCache
         .filter(match => match.status === "finalizado")
         .forEach(match => {
           const sport = match.sport;
@@ -328,11 +330,11 @@
 
         html += `
           <div class="classification-group" id="${sectionId}">
-            <h2 class="classification-title">${sport}</h2>
+            <h2 class="classification-title">${escapeHtml(sport)}</h2>
         `;
 
         if (!teams.length) {
-          html += `<div class="empty-box">Nenhuma equipe/participante cadastrada em ${sport}.</div>`;
+          html += `<div class="empty-box">Nenhuma equipe/participante cadastrada em ${escapeHtml(sport)}.</div>`;
         } else {
           html += `
             <div class="classification-table-wrapper">
@@ -357,8 +359,8 @@
             html += `
               <tr>
                 <td><span class="position-badge">${index + 1}</span></td>
-                <td>${team.teamName}</td>
-                <td>${sport === "Futsal" ? (team.captain || "-") : "-"}</td>
+                <td>${escapeHtml(team.teamName)}</td>
+                <td>${sport === "Futsal" ? escapeHtml(team.captain || "-") : "-"}</td>
                 <td>${team.games}</td>
                 <td>${team.wins}</td>
                 <td>${team.goalsFor}</td>
@@ -382,7 +384,19 @@
       container.innerHTML = html;
     }
 
-    renderClassification();
+    function atualizarTudo() {
+      renderClassification();
+    }
+
+    listenTeams((teams) => {
+      teamsCache = [...teams];
+      atualizarTudo();
+    });
+
+    listenMatches((matches) => {
+      matchesCache = [...matches];
+      atualizarTudo();
+    });
   </script>
 </body>
 </html>
