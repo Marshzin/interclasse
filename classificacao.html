@@ -199,6 +199,7 @@
     }
   </style>
 </head>
+
 <body>
   <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" onclick="toggleMobileMenu()">
     <div class="hamburger">
@@ -222,50 +223,11 @@
       <nav class="nav-section">
         <div class="nav-label">Menu Principal</div>
 
-        <a href="index.html" class="nav-item">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-          </svg>
-          Início
-        </a>
-
-        <a href="jogos.html" class="nav-item">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-          </svg>
-          Jogos
-        </a>
-
-        <a href="classificacao.html" class="nav-item custom-active-link">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 3v18h18"></path>
-            <path d="M18 17V9"></path>
-            <path d="M13 17V5"></path>
-            <path d="M8 17v-3"></path>
-          </svg>
-          Classificação
-        </a>
-
-        <a href="times.html" class="nav-item">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-          Times
-        </a>
-
-        <a href="administracao.html" class="nav-item">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 20h9"></path>
-            <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-          </svg>
-          Administração
-        </a>
+        <a href="index.html" class="nav-item">Início</a>
+        <a href="jogos.html" class="nav-item">Jogos</a>
+        <a href="classificacao.html" class="nav-item custom-active-link">Classificação</a>
+        <a href="times.html" class="nav-item">Times</a>
+        <a href="administracao.html" class="nav-item">Administração</a>
       </nav>
     </aside>
 
@@ -279,7 +241,7 @@
         <h2 style="margin:0 0 10px; color:#fff; font-size:22px;">Modalidades</h2>
         <div class="modalities-nav">
           <a href="#mod-futsal" class="modality-btn">Futsal</a>
-          <a href="#mod-volei" class="modality-btn">Volei</a>
+          <a href="#mod-volei" class="modality-btn">Vôlei</a>
           <a href="#mod-pingpong" class="modality-btn">Pingpong</a>
         </div>
       </div>
@@ -291,10 +253,12 @@
   </div>
 
   <script src="js/templatemo-crypto-script.js"></script>
+
   <script type="module">
     import { listenTeams, listenMatches } from "./firebase.js";
 
     const FIXED_SPORTS = ["Futsal", "Volei", "Pingpong"];
+
     let teamsCache = [];
     let matchesCache = [];
 
@@ -317,10 +281,6 @@
     }
 
     function buildDisplayName(team) {
-      if (team.sport === "Pingpong") {
-        const first = team.players && team.players[0] ? team.players[0] : null;
-        return first ? first.name : "Jogador";
-      }
       return team.teamName || "Equipe";
     }
 
@@ -352,6 +312,7 @@
         .filter(match => match.status === "finalizado")
         .forEach(match => {
           const sport = match.sport;
+
           if (!classification[sport]) return;
 
           const teamA = classification[sport].find(item => item.teamName === match.teamAName);
@@ -421,8 +382,14 @@
                 <thead>
                   <tr>
                     <th>Posição</th>
-                    <th>${sport === "Pingpong" ? "Jogador" : "Time"}</th>
-                    <th>${sport === "Futsal" ? "Capitão" : "Referência"}</th>
+                    <th>Time</th>
+
+                    ${
+                      sport === "Futsal" || sport === "Pingpong"
+                        ? "<th>Capitão</th>"
+                        : ""
+                    }
+
                     <th>Jogos</th>
                     <th>Vitórias</th>
                     <th>GP</th>
@@ -439,7 +406,13 @@
               <tr>
                 <td><span class="position-badge">${index + 1}</span></td>
                 <td>${escapeHtml(team.teamName)}</td>
-                <td>${sport === "Futsal" ? escapeHtml(team.captain || "-") : "-"}</td>
+
+                ${
+                  sport === "Futsal" || sport === "Pingpong"
+                    ? `<td>${escapeHtml(team.captain || "-")}</td>`
+                    : ""
+                }
+
                 <td>${team.games}</td>
                 <td>${team.wins}</td>
                 <td>${team.goalsFor}</td>
@@ -482,6 +455,7 @@
     function toggleMobileMenu() {
       const sidebar = document.getElementById("sidebar");
       const overlay = document.getElementById("sidebarOverlay");
+
       if (!sidebar || !overlay) return;
 
       sidebar.classList.toggle("mobile-open");
