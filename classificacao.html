@@ -331,9 +331,30 @@
       return cleanName(team.teamName) || "Equipe";
     }
 
-    function getGroupKey(sport, category) {
+    function getTeamCategory(team) {
+      return (
+        team.category ||
+        team.categoria ||
+        team.level ||
+        team.ensino ||
+        ""
+      );
+    }
+
+    function getMatchCategory(match) {
+      return (
+        match.category ||
+        match.categoria ||
+        match.level ||
+        match.ensino ||
+        ""
+      );
+    }
+
+    function getGroupKey(sport, category, teamName = "") {
       if (sport === "Futsal") {
         const normalizedCategory = normalizeCategory(category);
+        const name = cleanName(teamName).toLowerCase();
 
         if (normalizedCategory === "Fundamental") {
           return "Futsal-Fundamental";
@@ -341,6 +362,39 @@
 
         if (normalizedCategory === "Medio") {
           return "Futsal-Medio";
+        }
+
+        if (
+          name.includes("1 ano") ||
+          name.includes("1º ano") ||
+          name.includes("1ª série") ||
+          name.includes("1 serie") ||
+          name.includes("1ª serie") ||
+          name.includes("2 ano") ||
+          name.includes("2º ano") ||
+          name.includes("2ª série") ||
+          name.includes("2 serie") ||
+          name.includes("2ª serie") ||
+          name.includes("3 ano") ||
+          name.includes("3º ano") ||
+          name.includes("3ª série") ||
+          name.includes("3 serie") ||
+          name.includes("3ª serie")
+        ) {
+          return "Futsal-Medio";
+        }
+
+        if (
+          name.includes("6 ano") ||
+          name.includes("6º ano") ||
+          name.includes("7 ano") ||
+          name.includes("7º ano") ||
+          name.includes("8 ano") ||
+          name.includes("8º ano") ||
+          name.includes("9 ano") ||
+          name.includes("9º ano")
+        ) {
+          return "Futsal-Fundamental";
         }
 
         return "Futsal-Fundamental";
@@ -361,7 +415,11 @@
       });
 
       teamsCache.forEach(team => {
-        const groupKey = getGroupKey(team.sport, team.category);
+        const groupKey = getGroupKey(
+          team.sport,
+          getTeamCategory(team),
+          team.teamName
+        );
 
         if (!groupKey) return;
 
@@ -384,7 +442,11 @@
       matchesCache
         .filter(match => match.status === "finalizado")
         .forEach(match => {
-          const groupKey = getGroupKey(match.sport, match.category);
+          const groupKey = getGroupKey(
+            match.sport,
+            getMatchCategory(match),
+            match.teamAName
+          );
 
           if (!groupKey) return;
           if (!classification[groupKey]) return;
