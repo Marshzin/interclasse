@@ -1048,6 +1048,10 @@
     // ── GERENCIAR EQUIPES com subcategorias de Futsal ──────────────────────────
     function renderTeams() {
       let html = "";
+      html += `<div style="background:rgba(255,100,0,0.15);border:1px solid orange;border-radius:12px;padding:14px;margin-bottom:16px;color:#fff;font-size:12px;word-break:break-all;">
+        <strong>DEBUG - Total de equipes no cache: ${teamsCache.length}</strong><br>
+        ${teamsCache.map(t => `sport: <b>${t.sport}</b> | category: <b>${t.category}</b> | nome: <b>${t.teamName}</b>`).join("<br>")}
+      </div>`;
 
       FIXED_SPORTS.forEach(sport => {
         html += `<h3 class="group-title">${escapeHtml(sport)}</h3>`;
