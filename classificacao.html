@@ -547,12 +547,22 @@
                         : ""
                     }
 
-                    <th>Jogos</th>
-                    <th>Vitórias</th>
-                    <th>GP</th>
-                    <th>GC</th>
-                    <th>SG</th>
-                    <th>Pontos</th>
+                    ${
+                      group.sport === "Volei"
+                        ? `
+                          <th>Jogos</th>
+                          <th>Vitórias</th>
+                          <th>Pontos</th>
+                        `
+                        : `
+                          <th>Jogos</th>
+                          <th>Vitórias</th>
+                          <th>GP</th>
+                          <th>GC</th>
+                          <th>SG</th>
+                          <th>Pontos</th>
+                        `
+                    }
                   </tr>
                 </thead>
                 <tbody>
@@ -570,12 +580,22 @@
                     : ""
                 }
 
-                <td>${team.games}</td>
-                <td>${team.wins}</td>
-                <td>${team.goalsFor}</td>
-                <td>${team.goalsAgainst}</td>
-                <td>${team.goalDifference}</td>
-                <td>${team.points}</td>
+                ${
+                  group.sport === "Volei"
+                    ? `
+                      <td>${team.games}</td>
+                      <td>${team.wins}</td>
+                      <td>${team.points}</td>
+                    `
+                    : `
+                      <td>${team.games}</td>
+                      <td>${team.wins}</td>
+                      <td>${team.goalsFor}</td>
+                      <td>${team.goalsAgainst}</td>
+                      <td>${team.goalDifference}</td>
+                      <td>${team.points}</td>
+                    `
+                }
               </tr>
             `;
           });
