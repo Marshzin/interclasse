@@ -1590,7 +1590,11 @@
     <div class="match-box">
       <div class="match-meta">
         ${escapeHtml(match.sport)}
-        ${match.sport === "Futsal" ? " - " + escapeHtml(getCategoryLabel(match.category)) : ""}
+        ${
+          match.sport === "Futsal" && match.category
+            ? " - " + escapeHtml(getCategoryLabel(match.category))
+            : ""
+        }
       </div>
 
       <div class="status-tag ${getStatusClass(match.status)}">
@@ -1631,6 +1635,73 @@
           onclick="deleteMatch('${match.id}')">
           Excluir jogo
         </button>
+      </div>
+
+      <div class="match-management-panel" id="${managePanelId}">
+        <div class="btn-row-custom">
+          <button class="btn-custom btn-secondary-custom"
+            onclick="setMatchStatus('${match.id}', 'nao_iniciado')">
+            Não iniciado
+          </button>
+
+          <button class="btn-custom btn-warning-custom"
+            onclick="setMatchStatus('${match.id}', 'andamento')">
+            Iniciar jogo
+          </button>
+
+          <button class="btn-custom players-btn"
+            onclick="setMatchStatus('${match.id}', 'intervalo')">
+            Intervalo
+          </button>
+
+          <button class="btn-custom btn-success-custom"
+            onclick="setMatchStatus('${match.id}', 'finalizado')">
+            Finalizar
+          </button>
+        </div>
+
+        <div class="mini-form-grid">
+          <div class="form-group-custom">
+            <label class="form-label-custom">Participante</label>
+            <select class="form-select-custom"
+              id="event-team-${match.id}"
+              onchange="updatePlayerSelect('${match.id}')"
+              ${isFinalized ? "disabled" : ""}>
+              <option value="">Selecione</option>
+              <option value="${escapeHtml(match.teamAKey)}">${escapeHtml(match.teamAName)}</option>
+              <option value="${escapeHtml(match.teamBKey)}">${escapeHtml(match.teamBName)}</option>
+            </select>
+          </div>
+
+          <div class="form-group-custom">
+            <label class="form-label-custom">Jogador</label>
+            <select class="form-select-custom"
+              id="event-player-${match.id}"
+              ${isFinalized ? "disabled" : ""}>
+              <option value="">Selecione</option>
+            </select>
+          </div>
+
+          <div class="form-group-custom">
+            <label class="form-label-custom">Evento</label>
+            <select class="form-select-custom"
+              id="event-type-${match.id}"
+              ${isFinalized ? "disabled" : ""}>
+              <option value="">Selecione</option>
+              <option value="goal">${match.sport === "Volei" ? "Ponto" : "Gol"}</option>
+              <option value="yellow">${match.sport === "Volei" ? "Advertência" : "Cartão amarelo"}</option>
+              <option value="red">${match.sport === "Volei" ? "Expulsão" : "Cartão vermelho"}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="btn-row-custom">
+          <button class="btn-custom btn-success-custom"
+            onclick="addEventToMatch('${match.id}')"
+            ${isFinalized ? "disabled" : ""}>
+            Adicionar evento
+          </button>
+        </div>
       </div>
 
       <div class="players-panel" id="${panelId}">
@@ -1680,7 +1751,9 @@ function renderMatches() {
       });
 
     } else {
-      const sportMatches = matchesCache.filter(match => match.sport === sport);
+      const sportMatches = matchesCache.filter(
+        match => match.sport === sport
+      );
 
       if (!sportMatches.length) {
         html += `
@@ -1688,16 +1761,15 @@ function renderMatches() {
             Nenhum jogo cadastrado em ${escapeHtml(sport)}.
           </div>
         `;
-        return;
+      } else {
+        html += `<div class="matches-grid">`;
+
+        sportMatches.forEach(match => {
+          html += renderMatchCard(match);
+        });
+
+        html += `</div>`;
       }
-
-      html += `<div class="matches-grid">`;
-
-      sportMatches.forEach(match => {
-        html += renderMatchCard(match);
-      });
-
-      html += `</div>`;
     }
   });
 
