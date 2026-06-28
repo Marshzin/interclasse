@@ -57,6 +57,7 @@ export function generateSafeKey(team) {
 export async function createTeam(teamData) {
   const payload = {
     sport: sanitizeText(teamData.sport),
+    category: sanitizeText(teamData.category), // ADICIONADO
     teamName: sanitizeText(teamData.teamName),
     captain: sanitizeText(teamData.captain),
     players: Array.isArray(teamData.players) ? clone(teamData.players) : [],
@@ -72,6 +73,7 @@ export async function createTeam(teamData) {
 export async function updateTeam(teamId, teamData) {
   const payload = {
     sport: sanitizeText(teamData.sport),
+    category: sanitizeText(teamData.category), // ADICIONADO
     teamName: sanitizeText(teamData.teamName),
     captain: sanitizeText(teamData.captain),
     players: Array.isArray(teamData.players) ? clone(teamData.players) : [],
@@ -132,6 +134,7 @@ export async function clearAllTeams() {
 export async function createMatch(matchData) {
   const payload = {
     sport: sanitizeText(matchData.sport),
+category: sanitizeText(matchData.category),
     teamAKey: sanitizeText(matchData.teamAKey),
     teamBKey: sanitizeText(matchData.teamBKey),
     teamAName: sanitizeText(matchData.teamAName),
@@ -153,6 +156,7 @@ export async function createMatch(matchData) {
 export async function updateMatch(matchId, matchData) {
   const payload = {
     sport: sanitizeText(matchData.sport),
+category: sanitizeText(matchData.category),
     teamAKey: sanitizeText(matchData.teamAKey),
     teamBKey: sanitizeText(matchData.teamBKey),
     teamAName: sanitizeText(matchData.teamAName),
