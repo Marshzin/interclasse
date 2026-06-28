@@ -1640,6 +1640,11 @@
           Eventos
         </button>
 
+        <button class="btn-custom btn-primary-custom"
+          onclick="downloadSumula('${match.id}')">
+          Baixar súmula
+        </button>
+
         <button class="btn-custom btn-danger-custom"
           onclick="deleteMatch('${match.id}')">
           Excluir jogo
@@ -1927,6 +1932,224 @@ function renderMatches() {
         </div>
       `;
     }
+
+
+
+    function downloadSumula(matchId) {
+      const match = matchesCache.find(item => item.id === matchId);
+      if (!match) return;
+
+      const teamA = getTeamByKey(match.teamAKey);
+      const teamB = getTeamByKey(match.teamBKey);
+      const events = Array.isArray(match.events) ? match.events : [];
+
+      function countEvents(teamName, playerName, type) {
+        return events.filter(event =>
+          event.teamName === teamName &&
+          event.playerName === playerName &&
+          event.type === type
+        ).length;
+      }
+
+      function playersRows(team, teamName) {
+        const players = team && Array.isArray(team.players) ? team.players : [];
+        let rows = "";
+
+        for (let i = 0; i < 14; i++) {
+          const player = players[i] || {};
+          const yellow = player.name ? countEvents(teamName, player.name, "yellow") : 0;
+          const red = player.name ? countEvents(teamName, player.name, "red") : 0;
+          const foul = player.name ? countEvents(teamName, player.name, "foul") : 0;
+
+          rows += `
+            <tr>
+              <td class="center">${i + 1}</td>
+              <td>${escapeHtml(player.name || "")}</td>
+              <td class="center">${escapeHtml(player.number || "")}</td>
+              <td class="center">${yellow || "-"}</td>
+              <td class="center">${red || "-"}</td>
+              <td class="center">${foul || "-"}</td>
+            </tr>
+          `;
+        }
+
+        return rows;
+      }
+
+      function goalsTable(teamName) {
+        const goals = events.filter(event => event.teamName === teamName && event.type === "goal");
+        let html = "";
+
+        for (let row = 0; row < 4; row++) {
+          html += "<tr>";
+          for (let col = 0; col < 5; col++) {
+            const index = row * 5 + col;
+            const goal = goals[index];
+            html += `<td><strong>${index + 1}-</strong> ${goal ? escapeHtml(goal.playerName || "") : ""}</td>`;
+          }
+          html += "</tr>";
+        }
+
+        return html;
+      }
+
+      function foulsTotal(teamName) {
+        return events.filter(event => event.teamName === teamName && event.type === "foul").length;
+      }
+
+      function teamBlock(title, team, teamName) {
+        return `
+          <table>
+            <tr>
+              <th colspan="6" class="left">${escapeHtml(title)} - ${escapeHtml(teamName)} / saída ( )</th>
+            </tr>
+            <tr>
+              <th style="width:40px;">Nº</th>
+              <th>Jogadores</th>
+              <th style="width:70px;">Camisa</th>
+              <th style="width:60px;">Ama</th>
+              <th style="width:60px;">Verm</th>
+              <th style="width:60px;">Faltas</th>
+            </tr>
+            ${playersRows(team, teamName)}
+            <tr>
+              <td colspan="3"><strong>Técnico:</strong></td>
+              <td colspan="3"><strong>Capitão:</strong> ${escapeHtml(team && team.captain ? team.captain : "")}</td>
+            </tr>
+            <tr>
+              <td colspan="6"><strong>Total de faltas:</strong> ${foulsTotal(teamName)}</td>
+            </tr>
+          </table>
+
+          <table>
+            <tr><th colspan="5">Gols / Pontos - ${escapeHtml(teamName)}</th></tr>
+            ${goalsTable(teamName)}
+          </table>
+        `;
+      }
+
+      const sumulaHtml = `
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Súmula - ${escapeHtml(match.teamAName)} x ${escapeHtml(match.teamBName)}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      color: #000;
+      background: #fff;
+      margin: 0;
+      padding: 18px;
+    }
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      border: 3px solid #000;
+      padding: 18px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 34px;
+      margin: 0 0 14px;
+      letter-spacing: 1px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      table-layout: fixed;
+    }
+    th, td {
+      border: 2px solid #000;
+      padding: 5px;
+      font-size: 14px;
+      height: 26px;
+      vertical-align: middle;
+    }
+    th {
+      background: #d9d9d9;
+      font-weight: bold;
+      text-align: center;
+    }
+    .center { text-align: center; }
+    .left { text-align: left; }
+    .score {
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .top-actions {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    button {
+      border: 2px solid #000;
+      background: #fff;
+      color: #000;
+      padding: 10px 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    @media print {
+      body { padding: 0; }
+      .top-actions { display: none; }
+      .page { border: 3px solid #000; max-width: none; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-actions">
+    <button onclick="window.print()">Imprimir / Salvar em PDF</button>
+  </div>
+
+  <div class="page">
+    <h1>INTERCLASSE - WALTER PAIVA</h1>
+
+    <table>
+      <tr>
+        <td colspan="4"><strong>Competição:</strong> Interclasse</td>
+        <td colspan="2"><strong>Jogo Nº:</strong> ${escapeHtml(match.id)}</td>
+      </tr>
+      <tr>
+        <td colspan="2" class="center"><strong>${escapeHtml(match.teamAName)}</strong></td>
+        <td colspan="2" class="score">${Number(match.goalsA || 0)} X ${Number(match.goalsB || 0)}</td>
+        <td colspan="2" class="center"><strong>${escapeHtml(match.teamBName)}</strong></td>
+      </tr>
+      <tr>
+        <td colspan="2"><strong>Categoria:</strong> ${escapeHtml(getCategoryLabel(match.category) || match.sport)}</td>
+        <td><strong>Ginásio:</strong></td>
+        <td><strong>Cidade:</strong></td>
+        <td colspan="2"><strong>Data:</strong> ${formatDateBR(match.date)}</td>
+      </tr>
+      <tr>
+        <td colspan="6"><strong>Árbitros:</strong></td>
+      </tr>
+      <tr>
+        <td colspan="6"><strong>Anotadores:</strong></td>
+      </tr>
+    </table>
+
+    ${teamBlock('Equipe A', teamA, match.teamAName)}
+    ${teamBlock('Equipe B', teamB, match.teamBName)}
+  </div>
+</body>
+</html>
+      `;
+
+      const printWindow = window.open("", "_blank");
+      if (!printWindow) {
+        alert("Permita pop-ups para abrir a súmula.");
+        return;
+      }
+
+      printWindow.document.open();
+      printWindow.document.write(sumulaHtml);
+      printWindow.document.close();
+    }
+    window.downloadSumula = downloadSumula;
+
 
     function renderSummary() {
       if (!summaryContainer) return;
