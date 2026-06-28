@@ -685,7 +685,6 @@
                     <option value="">Selecione</option>
                     <option value="Futsal">Futsal</option>
                     <option value="Volei">Volei</option>
-                    <option value="Pingpong">Pingpong</option>
                   </select>
                 </div>
 
@@ -745,7 +744,6 @@
                     <option value="">Selecione</option>
                     <option value="Futsal">Futsal</option>
                     <option value="Volei">Volei</option>
-                    <option value="Pingpong">Pingpong</option>
                   </select>
                 </div>
 
@@ -826,7 +824,7 @@
     } from "./firebase.js";
 
     const ADMIN_PASSWORD = "1008";
-    const FIXED_SPORTS = ["Futsal", "Volei", "Pingpong"];
+    const FIXED_SPORTS = ["Futsal", "Volei"];
 
     const teamForm = document.getElementById("teamForm");
     const editIndexInput = document.getElementById("editIndex");
@@ -958,15 +956,6 @@
         fields.captain.value = "";
         fields.players.placeholder = "Ana Clara\nMaria Eduarda";
         playersHelp.textContent = "Digite vários jogadores, um por linha, sem número.";
-      } else if (sport === "Pingpong") {
-        categoryGroup.style.display = "none";
-        fields.category.value = "";
-        teamNameGroup.style.display = "none";
-        captainGroup.style.display = "none";
-        fields.teamName.value = "";
-        fields.captain.value = "";
-        fields.players.placeholder = "João Pedro";
-        playersHelp.textContent = "Digite apenas 1 jogador, sem número.";
       } else {
         categoryGroup.style.display = "none";
         fields.category.value = "";
@@ -1020,10 +1009,6 @@
 
     function buildDisplayName(team) {
       if (!team) return "";
-      if (team.sport === "Pingpong") {
-        const first = team.players && team.players[0] ? team.players[0] : null;
-        return first ? first.name : "Jogador";
-      }
       return team.teamName || "";
     }
 
@@ -1079,9 +1064,7 @@
               </div>
               <h3>${escapeHtml(title)}</h3>
               ${team.sport === "Futsal" ? `<p><strong>Capitão:</strong> ${escapeHtml(team.captain || "")}</p>` : ""}
-              ${team.sport === "Pingpong"
-                ? `<p><strong>Participante individual</strong></p>`
-                : `<p><strong>Jogadores cadastrados:</strong> ${(team.players || []).length}</p>`}
+              <p><strong>Jogadores cadastrados:</strong> ${(team.players || []).length}</p>
 
               <div class="team-actions">
                 <button class="btn-custom players-btn" data-open-label="Ocultar jogadores" data-closed-label="Jogadores" onclick="togglePlayers('${playersId}', this)">Jogadores</button>
@@ -1157,11 +1140,6 @@
 
       if (!sport) return;
 
-      if (sport === "Pingpong" && players.length !== 1) {
-        alert("No Pingpong, cadastre apenas 1 jogador.");
-        return;
-      }
-
       if ((sport === "Futsal" || sport === "Volei") && !fields.teamName.value.trim()) {
         alert("Informe o nome do time.");
         return;
@@ -1180,7 +1158,7 @@
       const teamData = {
         sport,
         category: sport === "Futsal" ? fields.category.value : "",
-        teamName: sport === "Pingpong" ? "" : fields.teamName.value.trim(),
+        teamName: fields.teamName.value.trim(),
         captain: sport === "Futsal" ? fields.captain.value.trim() : "",
         points: 0,
         players
