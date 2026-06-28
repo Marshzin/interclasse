@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br" data-theme="dark">
 <head>
   <meta charset="UTF-8">
@@ -1453,12 +1453,17 @@
       const eventPlayerSelect = document.getElementById(`event-player-${matchId}`);
       const eventTypeSelect = document.getElementById(`event-type-${matchId}`);
 
-      const teamName = eventTeamSelect.value;
-      const playerName = eventPlayerSelect.value;
-      const eventType = eventTypeSelect.value;
+      const teamName = eventTeamSelect ? eventTeamSelect.value : "";
+      const playerName = eventPlayerSelect ? eventPlayerSelect.value : "Ponto";
+      const eventType = eventTypeSelect ? eventTypeSelect.value : "";
 
-      if (!teamName || !playerName || !eventType) {
-        alert("Selecione participante, jogador e evento.");
+      if (!teamName || !eventType) {
+        alert("Selecione participante e evento.");
+        return;
+      }
+
+      if (eventPlayerSelect && !playerName) {
+        alert("Selecione o jogador.");
         return;
       }
 
@@ -1490,7 +1495,7 @@
 
       if (eventType === "goal") {
         if (teamName === updated.teamAKey) updated.goalsA += 1;
-        else updated.goalsB += 1;
+        if (teamName === updated.teamBKey) updated.goalsB += 1;
       }
 
       await updateMatch(matchId, updated);
@@ -1535,7 +1540,7 @@
         <div class="event-list">
           ${events.map(event => {
             let tagClass = "tag-goal";
-            let tagLabel = "Gol";
+            let tagLabel = "Gol / Ponto";
 
             if (event.type === "yellow") {
               tagClass = "tag-yellow";
@@ -1543,6 +1548,9 @@
             } else if (event.type === "red") {
               tagClass = "tag-red";
               tagLabel = "Cartão vermelho";
+            } else if (event.type === "foul") {
+              tagClass = "tag-yellow";
+              tagLabel = "Falta";
             }
 
             return `
@@ -1672,6 +1680,7 @@
             <label class="form-label-custom">Time</label>
             <select class="form-select-custom"
               id="event-team-${match.id}"
+              onchange="updatePlayerSelect('${match.id}')"
               ${isFinalized ? "disabled" : ""}>
               <option value="">Selecione</option>
               <option value="${escapeHtml(match.teamAKey)}">${escapeHtml(match.teamAName)}</option>
@@ -1686,7 +1695,6 @@
               <label class="form-label-custom">Jogador</label>
               <select class="form-select-custom"
                 id="event-player-${match.id}"
-                onchange="updatePlayerSelect('${match.id}')"
                 ${isFinalized ? "disabled" : ""}>
                 <option value="">Selecione</option>
               </select>
@@ -1699,6 +1707,7 @@
                 ${isFinalized ? "disabled" : ""}>
                 <option value="">Selecione</option>
                 <option value="goal">Gol</option>
+                <option value="foul">Falta</option>
                 <option value="yellow">Cartão amarelo</option>
                 <option value="red">Cartão vermelho</option>
               </select>
