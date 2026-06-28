@@ -80,6 +80,13 @@
       font-size: 22px;
     }
 
+    .subgroup-title {
+      margin: 18px 0 10px;
+      color: rgba(255,255,255,0.75);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
     .form-grid-custom {
       display: grid;
       grid-template-columns: repeat(2, minmax(220px, 1fr));
@@ -1038,48 +1045,88 @@
       return `<ul>${players.map(player => `<li>${player.number ? escapeHtml(player.number) + " - " : ""}${escapeHtml(player.name)}</li>`).join("")}</ul>`;
     }
 
+    // ── GERENCIAR EQUIPES com subcategorias de Futsal ──────────────────────────
     function renderTeams() {
       let html = "";
 
       FIXED_SPORTS.forEach(sport => {
-        const sportTeams = teamsCache.filter(team => team.sport === sport);
         html += `<h3 class="group-title">${escapeHtml(sport)}</h3>`;
 
-        if (!sportTeams.length) {
-          html += `<div class="empty-box">Nenhuma equipe cadastrada em ${escapeHtml(sport)}.</div>`;
-          return;
+        if (sport === "Futsal") {
+          const subcategories = [
+            { key: "Fundamental", label: "Ensino Fundamental" },
+            { key: "Medio",       label: "Ensino Médio"       }
+          ];
+
+          subcategories.forEach(({ key, label }) => {
+            const catTeams = teamsCache.filter(
+              t => t.sport === "Futsal" && normalizeCategory(t.category) === key
+            );
+
+            html += `<h4 class="subgroup-title">${escapeHtml(label)}</h4>`;
+
+            if (!catTeams.length) {
+              html += `<div class="empty-box">Nenhuma equipe cadastrada em Futsal – ${escapeHtml(label)}.</div>`;
+              return;
+            }
+
+            html += `<div class="teams-grid">`;
+            catTeams.forEach((team, index) => {
+              const playersId = `players-panel-Futsal-${key}-${index}-${team.id}`;
+              const title = buildDisplayName(team);
+
+              html += `
+                <div class="team-box">
+                  <div class="team-meta">Futsal – ${escapeHtml(label)}</div>
+                  <h3>${escapeHtml(title)}</h3>
+                  <p><strong>Capitão:</strong> ${escapeHtml(team.captain || "")}</p>
+                  <p><strong>Jogadores cadastrados:</strong> ${(team.players || []).length}</p>
+                  <div class="team-actions">
+                    <button class="btn-custom players-btn" data-open-label="Ocultar jogadores" data-closed-label="Jogadores" onclick="togglePlayers('${playersId}', this)">Jogadores</button>
+                    <button class="btn-custom btn-secondary-custom" onclick="editTeam('${team.id}')">Editar</button>
+                    <button class="btn-custom btn-danger-custom" onclick="deleteTeam('${team.id}')">Excluir</button>
+                  </div>
+                  <div class="players-panel" id="${playersId}">
+                    ${renderPlayersList(team.players || [])}
+                  </div>
+                </div>
+              `;
+            });
+            html += `</div>`;
+          });
+
+        } else {
+          // Vôlei (sem subcategoria)
+          const sportTeams = teamsCache.filter(t => t.sport === sport);
+
+          if (!sportTeams.length) {
+            html += `<div class="empty-box">Nenhuma equipe cadastrada em ${escapeHtml(sport)}.</div>`;
+            return;
+          }
+
+          html += `<div class="teams-grid">`;
+          sportTeams.forEach((team, index) => {
+            const playersId = `players-panel-${sport}-${index}-${team.id}`;
+            const title = buildDisplayName(team);
+
+            html += `
+              <div class="team-box">
+                <div class="team-meta">${escapeHtml(team.sport)}</div>
+                <h3>${escapeHtml(title)}</h3>
+                <p><strong>Jogadores cadastrados:</strong> ${(team.players || []).length}</p>
+                <div class="team-actions">
+                  <button class="btn-custom players-btn" data-open-label="Ocultar jogadores" data-closed-label="Jogadores" onclick="togglePlayers('${playersId}', this)">Jogadores</button>
+                  <button class="btn-custom btn-secondary-custom" onclick="editTeam('${team.id}')">Editar</button>
+                  <button class="btn-custom btn-danger-custom" onclick="deleteTeam('${team.id}')">Excluir</button>
+                </div>
+                <div class="players-panel" id="${playersId}">
+                  ${renderPlayersList(team.players || [])}
+                </div>
+              </div>
+            `;
+          });
+          html += `</div>`;
         }
-
-        html += `<div class="teams-grid">`;
-
-        sportTeams.forEach((team, index) => {
-          const playersId = `players-panel-${sport}-${index}-${team.id}`;
-          const title = buildDisplayName(team);
-
-          html += `
-            <div class="team-box">
-              <div class="team-meta">
-                ${escapeHtml(team.sport)}
-                ${team.sport === "Futsal" && team.category ? " - " + escapeHtml(getCategoryLabel(team.category)) : ""}
-              </div>
-              <h3>${escapeHtml(title)}</h3>
-              ${team.sport === "Futsal" ? `<p><strong>Capitão:</strong> ${escapeHtml(team.captain || "")}</p>` : ""}
-              <p><strong>Jogadores cadastrados:</strong> ${(team.players || []).length}</p>
-
-              <div class="team-actions">
-                <button class="btn-custom players-btn" data-open-label="Ocultar jogadores" data-closed-label="Jogadores" onclick="togglePlayers('${playersId}', this)">Jogadores</button>
-                <button class="btn-custom btn-secondary-custom" onclick="editTeam('${team.id}')">Editar</button>
-                <button class="btn-custom btn-danger-custom" onclick="deleteTeam('${team.id}')">Excluir</button>
-              </div>
-
-              <div class="players-panel" id="${playersId}">
-                ${renderPlayersList(team.players || [])}
-              </div>
-            </div>
-          `;
-        });
-
-        html += `</div>`;
       });
 
       teamsContainer.innerHTML = html;
