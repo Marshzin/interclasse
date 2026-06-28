@@ -1953,17 +1953,23 @@ function renderMatches() {
 
       function playersRows(team, teamName) {
         const players = team && Array.isArray(team.players) ? team.players : [];
-        let rows = "";
 
-        for (let i = 0; i < 14; i++) {
-          const player = players[i] || {};
+        if (!players.length) {
+          return `
+            <tr>
+              <td colspan="6" class="center">Nenhum jogador cadastrado.</td>
+            </tr>
+          `;
+        }
+
+        return players.map((player, index) => {
           const yellow = player.name ? countEvents(teamName, player.name, "yellow") : 0;
           const red = player.name ? countEvents(teamName, player.name, "red") : 0;
           const foul = player.name ? countEvents(teamName, player.name, "foul") : 0;
 
-          rows += `
+          return `
             <tr>
-              <td class="center">${i + 1}</td>
+              <td class="center">${index + 1}</td>
               <td>${escapeHtml(player.name || "")}</td>
               <td class="center">${escapeHtml(player.number || "")}</td>
               <td class="center">${yellow || "-"}</td>
@@ -1971,21 +1977,25 @@ function renderMatches() {
               <td class="center">${foul || "-"}</td>
             </tr>
           `;
-        }
-
-        return rows;
+        }).join("");
       }
 
       function goalsTable(teamName) {
         const goals = events.filter(event => event.teamName === teamName && event.type === "goal");
         let html = "";
 
-        for (let row = 0; row < 4; row++) {
+        if (!goals.length) {
+          return `<tr><td colspan="5" class="center">Nenhum gol/ponto registrado.</td></tr>`;
+        }
+
+        const totalRows = Math.ceil(goals.length / 5);
+
+        for (let row = 0; row < totalRows; row++) {
           html += "<tr>";
           for (let col = 0; col < 5; col++) {
             const index = row * 5 + col;
             const goal = goals[index];
-            html += `<td><strong>${index + 1}-</strong> ${goal ? escapeHtml(goal.playerName || "") : ""}</td>`;
+            html += `<td>${goal ? `<strong>${index + 1}-</strong> ${escapeHtml(goal.playerName || "")}` : ""}</td>`;
           }
           html += "</tr>";
         }
@@ -1997,11 +2007,11 @@ function renderMatches() {
         return events.filter(event => event.teamName === teamName && event.type === "foul").length;
       }
 
-      function teamBlock(title, team, teamName) {
+      function teamBlock(team, teamName) {
         return `
           <table>
             <tr>
-              <th colspan="6" class="left">${escapeHtml(title)} - ${escapeHtml(teamName)} / saída ( )</th>
+              <th colspan="6" class="left">Equipe - ${escapeHtml(teamName)} / saída ( )</th>
             </tr>
             <tr>
               <th style="width:40px;">Nº</th>
@@ -2013,8 +2023,7 @@ function renderMatches() {
             </tr>
             ${playersRows(team, teamName)}
             <tr>
-              <td colspan="3"><strong>Técnico:</strong></td>
-              <td colspan="3"><strong>Capitão:</strong> ${escapeHtml(team && team.captain ? team.captain : "")}</td>
+              <td colspan="6"><strong>Capitão:</strong> ${escapeHtml(team && team.captain ? team.captain : "")}</td>
             </tr>
             <tr>
               <td colspan="6"><strong>Total de faltas:</strong> ${foulsTotal(teamName)}</td>
@@ -2119,20 +2128,14 @@ function renderMatches() {
       </tr>
       <tr>
         <td colspan="2"><strong>Categoria:</strong> ${escapeHtml(getCategoryLabel(match.category) || match.sport)}</td>
-        <td><strong>Ginásio:</strong></td>
-        <td><strong>Cidade:</strong></td>
+        <td><strong>Ginásio:</strong> Walter Paiva</td>
+        <td><strong>Cidade:</strong> Ribeirão Preto</td>
         <td colspan="2"><strong>Data:</strong> ${formatDateBR(match.date)}</td>
-      </tr>
-      <tr>
-        <td colspan="6"><strong>Árbitros:</strong></td>
-      </tr>
-      <tr>
-        <td colspan="6"><strong>Anotadores:</strong></td>
       </tr>
     </table>
 
-    ${teamBlock('Equipe A', teamA, match.teamAName)}
-    ${teamBlock('Equipe B', teamB, match.teamBName)}
+    ${teamBlock(teamA, match.teamAName)}
+    ${teamBlock(teamB, match.teamBName)}
   </div>
 </body>
 </html>
@@ -2151,7 +2154,8 @@ function renderMatches() {
     window.downloadSumula = downloadSumula;
 
 
-    function renderSummary() {
+
+function renderSummary() {
       if (!summaryContainer) return;
 
       const summary = buildSummaryData();
