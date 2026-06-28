@@ -689,6 +689,15 @@
                   </select>
                 </div>
 
+                <div class="form-group-custom" id="categoryGroup" style="display:none;">
+                  <label class="form-label-custom" for="category">Categoria do Futsal</label>
+                  <select class="form-select-custom" id="category">
+                    <option value="">Selecione</option>
+                    <option value="Fundamental">Ensino Fundamental</option>
+                    <option value="Medio">Ensino Médio</option>
+                  </select>
+                </div>
+
                 <div class="form-group-custom" id="teamNameGroup">
                   <label class="form-label-custom" for="teamName">Nome do time</label>
                   <input class="form-input-custom" type="text" id="teamName" placeholder="Ex.: 9º Ano A">
@@ -732,11 +741,20 @@
               <div class="form-grid-custom">
                 <div class="form-group-custom">
                   <label class="form-label-custom" for="matchSport">Modalidade</label>
-                  <select class="form-select-custom" id="matchSport" required onchange="populateParticipantsBySport()">
+                  <select class="form-select-custom" id="matchSport" required onchange="updateMatchCategoryVisibility(); populateParticipantsBySport();">
                     <option value="">Selecione</option>
                     <option value="Futsal">Futsal</option>
                     <option value="Volei">Volei</option>
                     <option value="Pingpong">Pingpong</option>
+                  </select>
+                </div>
+
+                <div class="form-group-custom" id="matchCategoryGroup" style="display:none;">
+                  <label class="form-label-custom" for="matchCategory">Categoria do Futsal</label>
+                  <select class="form-select-custom" id="matchCategory" onchange="populateParticipantsBySport()">
+                    <option value="">Selecione</option>
+                    <option value="Fundamental">Ensino Fundamental</option>
+                    <option value="Medio">Ensino Médio</option>
                   </select>
                 </div>
 
@@ -820,6 +838,8 @@
 
     const matchForm = document.getElementById("matchForm");
     const matchSport = document.getElementById("matchSport");
+    const matchCategory = document.getElementById("matchCategory");
+    const matchCategoryGroup = document.getElementById("matchCategoryGroup");
     const teamASelect = document.getElementById("teamA");
     const teamBSelect = document.getElementById("teamB");
     const matchDateInput = document.getElementById("matchDate");
@@ -830,6 +850,7 @@
 
     const fields = {
       sport: document.getElementById("sport"),
+      category: document.getElementById("category"),
       teamName: document.getElementById("teamName"),
       captain: document.getElementById("captain"),
       players: document.getElementById("players")
@@ -860,24 +881,77 @@
         .replace(/'/g, "&#039;");
     }
 
+    function normalizeCategory(category) {
+      const value = String(category || "").trim().toLowerCase();
+
+      if (
+        value === "fundamental" ||
+        value === "ensino fundamental" ||
+        value === "ef"
+      ) {
+        return "Fundamental";
+      }
+
+      if (
+        value === "medio" ||
+        value === "médio" ||
+        value === "ensino medio" ||
+        value === "ensino médio" ||
+        value === "em"
+      ) {
+        return "Medio";
+      }
+
+      return "";
+    }
+
+    function getCategoryLabel(category) {
+      const normalized = normalizeCategory(category);
+
+      if (normalized === "Fundamental") return "Ensino Fundamental";
+      if (normalized === "Medio") return "Ensino Médio";
+
+      return "";
+    }
+
+    function updateMatchCategoryVisibility() {
+      if (!matchCategoryGroup || !matchCategory) return;
+
+      if (matchSport.value === "Futsal") {
+        matchCategoryGroup.style.display = "flex";
+        matchCategory.required = true;
+      } else {
+        matchCategoryGroup.style.display = "none";
+        matchCategory.required = false;
+        matchCategory.value = "";
+      }
+    }
+    window.updateMatchCategoryVisibility = updateMatchCategoryVisibility;
+
     function updateTeamFormFields() {
       const sport = fields.sport.value;
       const teamNameGroup = document.getElementById("teamNameGroup");
+      const categoryGroup = document.getElementById("categoryGroup");
       const captainGroup = document.getElementById("captainGroup");
       const playersHelp = document.getElementById("playersHelp");
 
       fields.teamName.required = false;
+      fields.category.required = false;
       fields.captain.required = false;
 
       if (sport === "Futsal") {
+        categoryGroup.style.display = "flex";
         teamNameGroup.style.display = "flex";
         captainGroup.style.display = "flex";
+        fields.category.required = true;
         fields.teamName.required = true;
         fields.captain.required = true;
         fields.teamName.placeholder = "Ex.: 9º Ano A";
         fields.players.placeholder = "10 - João Pedro\n7 - Lucas Silva";
         playersHelp.textContent = "Digite vários jogadores, um por linha, no formato número - nome.";
       } else if (sport === "Volei") {
+        categoryGroup.style.display = "none";
+        fields.category.value = "";
         teamNameGroup.style.display = "flex";
         captainGroup.style.display = "none";
         fields.teamName.required = true;
@@ -885,6 +959,8 @@
         fields.players.placeholder = "Ana Clara\nMaria Eduarda";
         playersHelp.textContent = "Digite vários jogadores, um por linha, sem número.";
       } else if (sport === "Pingpong") {
+        categoryGroup.style.display = "none";
+        fields.category.value = "";
         teamNameGroup.style.display = "none";
         captainGroup.style.display = "none";
         fields.teamName.value = "";
@@ -892,6 +968,8 @@
         fields.players.placeholder = "João Pedro";
         playersHelp.textContent = "Digite apenas 1 jogador, sem número.";
       } else {
+        categoryGroup.style.display = "none";
+        fields.category.value = "";
         teamNameGroup.style.display = "flex";
         captainGroup.style.display = "flex";
         fields.players.placeholder = "";
@@ -995,7 +1073,10 @@
 
           html += `
             <div class="team-box">
-              <div class="team-meta">${escapeHtml(team.sport)}</div>
+              <div class="team-meta">
+                ${escapeHtml(team.sport)}
+                ${team.sport === "Futsal" && team.category ? " - " + escapeHtml(getCategoryLabel(team.category)) : ""}
+              </div>
               <h3>${escapeHtml(title)}</h3>
               ${team.sport === "Futsal" ? `<p><strong>Capitão:</strong> ${escapeHtml(team.captain || "")}</p>` : ""}
               ${team.sport === "Pingpong"
@@ -1029,6 +1110,7 @@
       fields.sport.value = team.sport;
       updateTeamFormFields();
 
+      fields.category.value = normalizeCategory(team.category) || "";
       fields.teamName.value = team.teamName || "";
       fields.captain.value = team.captain || "";
       fields.players.value = playersToTextarea(team.players || [], team.sport);
@@ -1085,6 +1167,11 @@
         return;
       }
 
+      if (sport === "Futsal" && !fields.category.value) {
+        alert("Selecione a categoria do Futsal.");
+        return;
+      }
+
       if (sport === "Futsal" && !fields.captain.value.trim()) {
         alert("Informe o capitão.");
         return;
@@ -1092,6 +1179,7 @@
 
       const teamData = {
         sport,
+        category: sport === "Futsal" ? fields.category.value : "",
         teamName: sport === "Pingpong" ? "" : fields.teamName.value.trim(),
         captain: sport === "Futsal" ? fields.captain.value.trim() : "",
         points: 0,
@@ -1105,7 +1193,11 @@
 
         await updateTeam(editId, teamData);
 
-        if (previous && (previousKey !== newKey || previous.sport !== teamData.sport)) {
+        if (previous && (
+          previousKey !== newKey ||
+          previous.sport !== teamData.sport ||
+          normalizeCategory(previous.category) !== normalizeCategory(teamData.category)
+        )) {
           const relatedMatches = matchesCache.filter(match =>
             (match.teamAKey === previousKey || match.teamBKey === previousKey) && match.sport === previous.sport
           );
@@ -1113,6 +1205,7 @@
           for (const match of relatedMatches) {
             const updated = {
               sport: teamData.sport,
+              category: teamData.category || "",
               teamAKey: match.teamAKey,
               teamBKey: match.teamBKey,
               teamAName: match.teamAName,
@@ -1160,13 +1253,22 @@
       }
     });
 
-    function getTeamsBySport(sport) {
-      return teamsCache.filter(team => team.sport === sport);
+    function getTeamsBySport(sport, category = "") {
+      return teamsCache.filter(team => {
+        if (team.sport !== sport) return false;
+
+        if (sport === "Futsal") {
+          return normalizeCategory(team.category) === normalizeCategory(category);
+        }
+
+        return true;
+      });
     }
 
     function populateParticipantsBySport() {
       const sport = matchSport.value;
-      const teams = getTeamsBySport(sport);
+      const category = sport === "Futsal" ? matchCategory.value : "";
+      const teams = getTeamsBySport(sport, category);
 
       const currentA = teamASelect.value;
       const currentB = teamBSelect.value;
@@ -1199,12 +1301,18 @@
       event.preventDefault();
 
       const sport = matchSport.value;
+      const category = sport === "Futsal" ? matchCategory.value : "";
       const teamAName = teamASelect.value;
       const teamBName = teamBSelect.value;
       const matchDate = matchDateInput.value;
       const matchTime = matchTimeInput.value;
 
       if (!sport || !teamAName || !teamBName || !matchDate || !matchTime) return;
+
+      if (sport === "Futsal" && !category) {
+        alert("Selecione a categoria do Futsal.");
+        return;
+      }
 
       if (teamAName === teamBName) {
         alert("Selecione participantes diferentes.");
@@ -1213,6 +1321,7 @@
 
       await createMatch({
         sport,
+        category,
         teamAKey: teamAName,
         teamBKey: teamBName,
         teamAName,
@@ -1295,6 +1404,7 @@
 
       const updated = {
         sport: match.sport,
+        category: match.category || "",
         teamAKey: match.teamAKey,
         teamBKey: match.teamBKey,
         teamAName: match.teamAName,
@@ -1330,6 +1440,7 @@
 
       const updated = {
         sport: match.sport,
+        category: match.category || "",
         teamAKey: match.teamAKey,
         teamBKey: match.teamBKey,
         teamAName: match.teamAName,
@@ -1428,7 +1539,10 @@
 
           html += `
             <div class="match-box">
-              <div class="match-meta">${escapeHtml(match.sport)}</div>
+              <div class="match-meta">
+                ${escapeHtml(match.sport)}
+                ${match.sport === "Futsal" && match.category ? " - " + escapeHtml(getCategoryLabel(match.category)) : ""}
+              </div>
               <div class="status-tag ${getStatusClass(match.status)}">${getStatusLabel(match.status)}</div>
               <h3>${escapeHtml(match.teamAName)} x ${escapeHtml(match.teamBName)}</h3>
               <p><strong>Data:</strong> ${formatDateBR(match.date)}</p>
@@ -1517,6 +1631,7 @@
         teamStats[name] = {
           teamName: name,
           sport: team.sport,
+          category: team.category || "",
           games: 0,
           wins: 0,
           goalsFor: 0,
@@ -1679,7 +1794,10 @@
                       ? summary.teams.map(team => `
                         <tr>
                           <td>${escapeHtml(team.teamName)}</td>
-                          <td>${escapeHtml(team.sport)}</td>
+                          <td>
+                            ${escapeHtml(team.sport)}
+                            ${team.sport === "Futsal" && team.category ? " - " + escapeHtml(getCategoryLabel(team.category)) : ""}
+                          </td>
                           <td>${team.games}</td>
                           <td>${team.wins}</td>
                           <td>${team.goalsFor}</td>
@@ -1738,6 +1856,7 @@
 
     updateTeamFormFields();
     resetTeamForm();
+    updateMatchCategoryVisibility();
     populateParticipantsBySport();
 
     listenTeams((teams) => {
