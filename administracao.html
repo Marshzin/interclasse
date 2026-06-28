@@ -1741,7 +1741,7 @@
         html += `</div>`;
       });
 
-    } else {
+} else {
   const sportMatches = matchesCache.filter(match => match.sport === sport);
 
   if (!sportMatches.length) {
@@ -1880,6 +1880,10 @@
 
   html += `</div>`;
 }
+
+      html += `</div>`;
+    }
+  });
 
   matchesContainer.innerHTML = html;
 }
@@ -2140,4 +2144,3 @@
   </script>
 </body>
 </html>
-
