@@ -2011,7 +2011,7 @@ function renderMatches() {
         return `
           <table>
             <tr>
-              <th colspan="6" class="left">Equipe - ${escapeHtml(teamName)} / saída ( )</th>
+              <th colspan="6" class="left">Equipe - ${escapeHtml(teamName)}</th>
             </tr>
             <tr>
               <th style="width:40px;">Nº</th>
@@ -2118,7 +2118,7 @@ function renderMatches() {
 
     <table>
       <tr>
-        <td colspan="4"><strong>Competição:</strong> Interclasse</td>
+        <td colspan="4"><strong>Competição:</strong> ${match.sport === "Volei" ? "Vôlei" : "Futsal"}</td>
         <td colspan="2"><strong>Jogo Nº:</strong> ${escapeHtml(match.id)}</td>
       </tr>
       <tr>
