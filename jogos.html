@@ -157,7 +157,6 @@
       padding: 14px;
       flex-wrap: nowrap;
       overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
     }
 
     .team-name {
@@ -303,23 +302,6 @@
         width: 100%;
       }
     }
-
-    @media (max-width: 600px) {
-      .score-line {
-        gap: 6px;
-        font-size: 14px;
-        justify-content: flex-start;
-      }
-
-      .score-center {
-        font-size: 16px;
-      }
-
-      .score-badge {
-        min-width: 30px;
-        padding: 5px 6px;
-      }
-    }
   </style>
 </head>
 
@@ -387,6 +369,14 @@
       "Volei"
     ];
 
+    function normalizeText(text) {
+      return String(text || "")
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
+
     function escapeHtml(text) {
       return String(text ?? "")
         .replace(/&/g, "&amp;")
@@ -404,10 +394,7 @@
     }
 
     function createSafeId(text) {
-      return "games-" + text
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
+      return "games-" + normalizeText(text)
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
     }
@@ -471,26 +458,64 @@
     }
 
     function matchBelongsToSection(match, section) {
-      if (section === "Futsal - Ensino Medio") {
-        return match.sport === "Futsal" && match.category === "Ensino Medio";
+      const sport = normalizeText(match.sport);
+      const category = normalizeText(match.category);
+      const sectionNormalized = normalizeText(section);
+
+      if (sectionNormalized === "futsal - ensino medio") {
+        return (
+          sport === "futsal - ensino medio" ||
+          sport === "futsal ensino medio" ||
+          sport === "futsal medio" ||
+          sport === "futsal - medio" ||
+          (sport === "futsal" && (
+            category === "ensino medio" ||
+            category === "medio"
+          ))
+        );
       }
 
-      if (section === "Futsal - Ensino Fundamental") {
-        return match.sport === "Futsal" && match.category === "Ensino Fundamental";
+      if (sectionNormalized === "futsal - ensino fundamental") {
+        return (
+          sport === "futsal - ensino fundamental" ||
+          sport === "futsal ensino fundamental" ||
+          sport === "futsal fundamental" ||
+          sport === "futsal - fundamental" ||
+          (sport === "futsal" && (
+            category === "ensino fundamental" ||
+            category === "fundamental"
+          ))
+        );
       }
 
-      return match.sport === section;
+      if (sectionNormalized === "volei") {
+        return (
+          sport === "volei" ||
+          sport === "volei" ||
+          sport === "vôlei"
+        );
+      }
+
+      return sport === sectionNormalized;
+    }
+
+    function getSectionLabel(section) {
+      if (section === "Futsal - Ensino Medio") return "Futsal - Ensino Médio";
+      if (section === "Futsal - Ensino Fundamental") return "Futsal - Ensino Fundamental";
+      if (section === "Volei") return "Vôlei";
+      return section;
     }
 
     function renderGames(matches) {
       const container = document.getElementById("gamesContainer");
       let html = "";
 
-      FIXED_SPORTS.forEach(sport => {
-        const sectionId = createSafeId(sport);
+      FIXED_SPORTS.forEach(section => {
+        const sectionId = createSafeId(section);
+        const sectionLabel = getSectionLabel(section);
 
         const matchesBySport = matches
-          .filter(match => matchBelongsToSection(match, sport))
+          .filter(match => matchBelongsToSection(match, section))
           .sort((a, b) => {
             const dateTimeA = new Date(`${a.date || "9999-12-31"}T${a.time || "23:59"}`);
             const dateTimeB = new Date(`${b.date || "9999-12-31"}T${b.time || "23:59"}`);
@@ -499,11 +524,11 @@
 
         html += `
           <div class="games-group" id="${sectionId}">
-            <h2 class="games-title">${escapeHtml(sport)}</h2>
+            <h2 class="games-title">${escapeHtml(sectionLabel)}</h2>
         `;
 
         if (!matchesBySport.length) {
-          html += `<div class="empty-box">Nenhum jogo marcado em ${escapeHtml(sport)}.</div>`;
+          html += `<div class="empty-box">Nenhum jogo marcado em ${escapeHtml(sectionLabel)}.</div>`;
         } else {
           html += `<div class="matches-grid">`;
 
@@ -512,7 +537,7 @@
 
             html += `
               <div class="match-box">
-                <div class="match-meta">${escapeHtml(sport)}</div>
+                <div class="match-meta">${escapeHtml(sectionLabel)}</div>
                 <div class="status-tag ${getStatusClass(match.status)}">${getStatusLabel(match.status)}</div>
 
                 <h3>${escapeHtml(match.teamAName)} x ${escapeHtml(match.teamBName)}</h3>
