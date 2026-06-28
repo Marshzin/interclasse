@@ -1711,69 +1711,158 @@
   `;
 }
 
-function renderMatches() {
-  let html = "";
+function renderMatchCard(match) {
+  const panelId = `match-events-${match.id}`;
+  const managePanelId = `manage-panel-${match.id}`;
+  const isFinalized = match.status === "finalizado";
+  const isVolei = match.sport === "Volei";
 
-  FIXED_SPORTS.forEach(sport => {
-    html += `<h3 class="group-title">${escapeHtml(sport)}</h3>`;
-
-    if (sport === "Futsal") {
-      const categories = ["Fundamental", "Medio"];
-
-      categories.forEach(category => {
-        const categoryMatches = matchesCache.filter(match =>
-          match.sport === "Futsal" &&
-          normalizeCategory(match.category) === category
-        );
-
-        html += `
-          <h4 style="margin:18px 0 10px;color:#fff;font-size:18px;">
-            ${getCategoryLabel(category)}
-          </h4>
-        `;
-
-        if (!categoryMatches.length) {
-          html += `
-            <div class="empty-box">
-              Nenhum jogo cadastrado em ${getCategoryLabel(category)}.
-            </div>
-          `;
-          return;
+  return `
+    <div class="match-box">
+      <div class="match-meta">
+        ${escapeHtml(match.sport)}
+        ${
+          match.sport === "Futsal" && match.category
+            ? " - " + escapeHtml(getCategoryLabel(match.category))
+            : ""
         }
+      </div>
 
-        html += `<div class="matches-grid">`;
+      <div class="status-tag ${getStatusClass(match.status)}">
+        ${getStatusLabel(match.status)}
+      </div>
 
-        categoryMatches.forEach(match => {
-          html += renderMatchCard(match);
-        });
+      <h3>${escapeHtml(match.teamAName)} x ${escapeHtml(match.teamBName)}</h3>
 
-        html += `</div>`;
-      });
+      <p><strong>Data:</strong> ${formatDateBR(match.date)}</p>
+      <p><strong>Horário:</strong> ${escapeHtml(match.time || "Não informado")}</p>
 
-    } else {
-      const sportMatches = matchesCache.filter(
-        match => match.sport === sport
-      );
+      <div class="score-line">
+        <span class="score-team-name">${escapeHtml(match.teamAName)}</span>
 
-      if (!sportMatches.length) {
-        html += `
-          <div class="empty-box">
-            Nenhum jogo cadastrado em ${escapeHtml(sport)}.
+        <div class="score-center">
+          <span class="score-badge">${Number(match.goalsA) || 0}</span>
+          <span>X</span>
+          <span class="score-badge">${Number(match.goalsB) || 0}</span>
+        </div>
+
+        <span class="score-team-name">${escapeHtml(match.teamBName)}</span>
+      </div>
+
+      <div class="match-actions">
+        <button class="btn-custom btn-secondary-custom"
+          onclick="openMatchManagePanel('${match.id}', this)">
+          Gerenciar jogo
+        </button>
+
+        <button class="btn-custom players-btn"
+          data-open-label="Ocultar eventos"
+          data-closed-label="Eventos"
+          onclick="togglePlayers('${panelId}', this)">
+          Eventos
+        </button>
+
+        <button class="btn-custom btn-danger-custom"
+          onclick="deleteMatch('${match.id}')">
+          Excluir jogo
+        </button>
+      </div>
+
+      <div class="match-management-panel" id="${managePanelId}">
+        <div class="btn-row-custom">
+          <button class="btn-custom btn-secondary-custom"
+            onclick="setMatchStatus('${match.id}', 'nao_iniciado')">
+            Não iniciado
+          </button>
+
+          <button class="btn-custom btn-warning-custom"
+            onclick="setMatchStatus('${match.id}', 'andamento')">
+            Iniciar jogo
+          </button>
+
+          ${
+            !isVolei
+              ? `
+            <button class="btn-custom players-btn"
+              onclick="setMatchStatus('${match.id}', 'intervalo')">
+              Intervalo
+            </button>
+          `
+              : ""
+          }
+
+          <button class="btn-custom btn-success-custom"
+            onclick="setMatchStatus('${match.id}', 'finalizado')">
+            Finalizar
+          </button>
+        </div>
+
+        <div class="mini-form-grid">
+          <div class="form-group-custom">
+            <label class="form-label-custom">Time</label>
+            <select class="form-select-custom"
+              id="event-team-${match.id}"
+              ${isFinalized ? "disabled" : ""}>
+              <option value="">Selecione</option>
+              <option value="${escapeHtml(match.teamAKey)}">${escapeHtml(match.teamAName)}</option>
+              <option value="${escapeHtml(match.teamBKey)}">${escapeHtml(match.teamBName)}</option>
+            </select>
           </div>
-        `;
-      } else {
-        html += `<div class="matches-grid">`;
 
-        sportMatches.forEach(match => {
-          html += renderMatchCard(match);
-        });
+          ${
+            !isVolei
+              ? `
+            <div class="form-group-custom">
+              <label class="form-label-custom">Jogador</label>
+              <select class="form-select-custom"
+                id="event-player-${match.id}"
+                onchange="updatePlayerSelect('${match.id}')"
+                ${isFinalized ? "disabled" : ""}>
+                <option value="">Selecione</option>
+              </select>
+            </div>
 
-        html += `</div>`;
-      }
-    }
-  });
+            <div class="form-group-custom">
+              <label class="form-label-custom">Evento</label>
+              <select class="form-select-custom"
+                id="event-type-${match.id}"
+                ${isFinalized ? "disabled" : ""}>
+                <option value="">Selecione</option>
+                <option value="goal">Gol</option>
+                <option value="yellow">Cartão amarelo</option>
+                <option value="red">Cartão vermelho</option>
+              </select>
+            </div>
+          `
+              : `
+            <div class="form-group-custom">
+              <label class="form-label-custom">Set</label>
+              <select class="form-select-custom"
+                id="event-type-${match.id}"
+                ${isFinalized ? "disabled" : ""}>
+                <option value="">Selecione</option>
+                <option value="goal">Ponto / Set</option>
+              </select>
+            </div>
+          `
+          }
+        </div>
 
-  matchesContainer.innerHTML = html;
+        <div class="btn-row-custom">
+          <button class="btn-custom btn-success-custom"
+            onclick="addEventToMatch('${match.id}')"
+            ${isFinalized ? "disabled" : ""}>
+            Adicionar
+          </button>
+        </div>
+      </div>
+
+      <div class="players-panel" id="${panelId}">
+        ${renderEvents(match.events || [])}
+      </div>
+    </div>
+  `;
+}
 }
 
     function buildSummaryData() {
