@@ -1059,9 +1059,15 @@
           ];
 
           for (const { key, label } of subcategories) {
-            const catTeams = teamsCache.filter(
-              t => t.sport === "Futsal" && normalizeCategory(t.category) === key
-            );
+            const catTeams = teamsCache.filter(t => {
+              if (t.sport !== "Futsal") return false;
+              const norm = normalizeCategory(t.category);
+              if (norm) return norm === key;
+              const raw = String(t.category || "").trim();
+              if (key === "Fundamental") return /fundamental/i.test(raw);
+              if (key === "Medio") return /médio|medio/i.test(raw);
+              return false;
+            });
 
             html += `<h4 class="subgroup-title">${escapeHtml(label)}</h4>`;
 
