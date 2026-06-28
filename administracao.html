@@ -1038,13 +1038,12 @@
       return `<ul>${players.map(player => `<li>${player.number ? escapeHtml(player.number) + " - " : ""}${escapeHtml(player.name)}</li>`).join("")}</ul>`;
     }
 
- function renderTeams() {
+function renderTeams() {
   let html = "";
 
   FIXED_SPORTS.forEach(sport => {
     html += `<h3 class="group-title">${escapeHtml(sport)}</h3>`;
 
-    // Separação especial para Futsal
     if (sport === "Futsal") {
       const categories = ["Fundamental", "Medio"];
 
@@ -1060,54 +1059,92 @@
           </h4>
         `;
 
-        if (!categoryTeams.length) {
+        if (categoryTeams.length > 0) {
+          html += `<div class="teams-grid">`;
+
+          categoryTeams.forEach((team, index) => {
+            const playersId = `players-panel-${sport}-${category}-${index}-${team.id}`;
+            const title = buildDisplayName(team);
+
+            html += `
+              <div class="team-box">
+                <div class="team-meta">
+                  ${escapeHtml(team.sport)} - ${escapeHtml(getCategoryLabel(team.category))}
+                </div>
+
+                <h3>${escapeHtml(title)}</h3>
+
+                <p><strong>Capitão:</strong> ${escapeHtml(team.captain || "")}</p>
+                <p><strong>Jogadores cadastrados:</strong> ${(team.players || []).length}</p>
+
+                <div class="team-actions">
+                  <button class="btn-custom players-btn"
+                    data-open-label="Ocultar jogadores"
+                    data-closed-label="Jogadores"
+                    onclick="togglePlayers('${playersId}', this)">
+                    Jogadores
+                  </button>
+
+                  <button class="btn-custom btn-secondary-custom"
+                    onclick="editTeam('${team.id}')">
+                    Editar
+                  </button>
+
+                  <button class="btn-custom btn-danger-custom"
+                    onclick="deleteTeam('${team.id}')">
+                    Excluir
+                  </button>
+                </div>
+
+                <div class="players-panel" id="${playersId}">
+                  ${renderPlayersList(team.players || [])}
+                </div>
+              </div>
+            `;
+          });
+
+          html += `</div>`;
+        } else {
           html += `
             <div class="empty-box">
               Nenhuma equipe cadastrada em ${escapeHtml(getCategoryLabel(category))}.
             </div>
           `;
-          return;
         }
+      });
 
+    } else {
+      const sportTeams = teamsCache.filter(team => team.sport === sport);
+
+      if (sportTeams.length > 0) {
         html += `<div class="teams-grid">`;
 
-        categoryTeams.forEach((team, index) => {
-          const playersId = `players-panel-${sport}-${category}-${index}-${team.id}`;
+        sportTeams.forEach((team, index) => {
+          const playersId = `players-panel-${sport}-${index}-${team.id}`;
           const title = buildDisplayName(team);
 
           html += `
             <div class="team-box">
-              <div class="team-meta">
-                ${escapeHtml(team.sport)} - ${escapeHtml(getCategoryLabel(team.category))}
-              </div>
+              <div class="team-meta">${escapeHtml(team.sport)}</div>
 
               <h3>${escapeHtml(title)}</h3>
 
-              <p>
-                <strong>Capitão:</strong> ${escapeHtml(team.captain || "")}
-              </p>
-
-              <p>
-                <strong>Jogadores cadastrados:</strong> ${(team.players || []).length}
-              </p>
+              <p><strong>Jogadores cadastrados:</strong> ${(team.players || []).length}</p>
 
               <div class="team-actions">
-                <button
-                  class="btn-custom players-btn"
+                <button class="btn-custom players-btn"
                   data-open-label="Ocultar jogadores"
                   data-closed-label="Jogadores"
                   onclick="togglePlayers('${playersId}', this)">
                   Jogadores
                 </button>
 
-                <button
-                  class="btn-custom btn-secondary-custom"
+                <button class="btn-custom btn-secondary-custom"
                   onclick="editTeam('${team.id}')">
                   Editar
                 </button>
 
-                <button
-                  class="btn-custom btn-danger-custom"
+                <button class="btn-custom btn-danger-custom"
                   onclick="deleteTeam('${team.id}')">
                   Excluir
                 </button>
@@ -1121,69 +1158,13 @@
         });
 
         html += `</div>`;
-      });
-
-    } else {
-      // Outras modalidades (Vôlei)
-      const sportTeams = teamsCache.filter(team => team.sport === sport);
-
-      if (!sportTeams.length) {
+      } else {
         html += `
           <div class="empty-box">
             Nenhuma equipe cadastrada em ${escapeHtml(sport)}.
           </div>
         `;
-        return;
       }
-
-      html += `<div class="teams-grid">`;
-
-      sportTeams.forEach((team, index) => {
-        const playersId = `players-panel-${sport}-${index}-${team.id}`;
-        const title = buildDisplayName(team);
-
-        html += `
-          <div class="team-box">
-            <div class="team-meta">
-              ${escapeHtml(team.sport)}
-            </div>
-
-            <h3>${escapeHtml(title)}</h3>
-
-            <p>
-              <strong>Jogadores cadastrados:</strong> ${(team.players || []).length}
-            </p>
-
-            <div class="team-actions">
-              <button
-                class="btn-custom players-btn"
-                data-open-label="Ocultar jogadores"
-                data-closed-label="Jogadores"
-                onclick="togglePlayers('${playersId}', this)">
-                Jogadores
-              </button>
-
-              <button
-                class="btn-custom btn-secondary-custom"
-                onclick="editTeam('${team.id}')">
-                Editar
-              </button>
-
-              <button
-                class="btn-custom btn-danger-custom"
-                onclick="deleteTeam('${team.id}')">
-                Excluir
-              </button>
-            </div>
-
-            <div class="players-panel" id="${playersId}">
-              ${renderPlayersList(team.players || [])}
-            </div>
-          </div>
-        `;
-      });
-
-      html += `</div>`;
     }
   });
 
