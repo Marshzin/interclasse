@@ -1044,44 +1044,37 @@
   FIXED_SPORTS.forEach(sport => {
     html += `<h3 class="group-title">${escapeHtml(sport)}</h3>`;
 
-    // Separação por categoria no Futsal
     if (sport === "Futsal") {
-      const categories = ["Fundamental", "Medio"];
+      const fundamentalTeams = teamsCache.filter(team =>
+        team.sport === "Futsal" &&
+        normalizeCategory(team.category) === "Fundamental"
+      );
 
-      categories.forEach(category => {
-        const categoryTeams = teamsCache.filter(team =>
-          team.sport === "Futsal" &&
-          normalizeCategory(team.category) === category
-        );
+      const medioTeams = teamsCache.filter(team =>
+        team.sport === "Futsal" &&
+        normalizeCategory(team.category) === "Medio"
+      );
 
-        html += `
-          <h4 style="margin:18px 0 10px;color:#fff;font-size:18px;">
-            ${getCategoryLabel(category)}
-          </h4>
-        `;
+      const renderCategoryBlock = (title, teams, categoryKey) => {
+        html += `<h4 style="margin:18px 0 10px;color:#fff;">${title}</h4>`;
 
-        if (!categoryTeams.length) {
-          html += `
-            <div class="empty-box">
-              Nenhuma equipe cadastrada em ${getCategoryLabel(category)}.
-            </div>
-          `;
+        if (!teams.length) {
+          html += `<div class="empty-box">Nenhuma equipe cadastrada.</div>`;
           return;
         }
 
         html += `<div class="teams-grid">`;
 
-        categoryTeams.forEach((team, index) => {
-          const playersId = `players-panel-${sport}-${category}-${index}-${team.id}`;
-          const title = buildDisplayName(team);
+        teams.forEach((team, index) => {
+          const playersId = `players-panel-${categoryKey}-${index}-${team.id}`;
 
           html += `
             <div class="team-box">
               <div class="team-meta">
-                ${escapeHtml(team.sport)} - ${escapeHtml(getCategoryLabel(team.category))}
+                ${escapeHtml(team.sport)} - ${escapeHtml(title)}
               </div>
 
-              <h3>${escapeHtml(title)}</h3>
+              <h3>${escapeHtml(team.teamName)}</h3>
 
               <p><strong>Capitão:</strong> ${escapeHtml(team.captain || "")}</p>
               <p><strong>Jogadores cadastrados:</strong> ${(team.players || []).length}</p>
@@ -1116,18 +1109,16 @@
         });
 
         html += `</div>`;
-      });
+      };
+
+      renderCategoryBlock("Ensino Fundamental", fundamentalTeams, "fundamental");
+      renderCategoryBlock("Ensino Médio", medioTeams, "medio");
 
     } else {
-      // Vôlei sem categorias
       const sportTeams = teamsCache.filter(team => team.sport === sport);
 
       if (!sportTeams.length) {
-        html += `
-          <div class="empty-box">
-            Nenhuma equipe cadastrada em ${escapeHtml(sport)}.
-          </div>
-        `;
+        html += `<div class="empty-box">Nenhuma equipe cadastrada em ${escapeHtml(sport)}.</div>`;
         return;
       }
 
@@ -1135,15 +1126,12 @@
 
       sportTeams.forEach((team, index) => {
         const playersId = `players-panel-${sport}-${index}-${team.id}`;
-        const title = buildDisplayName(team);
 
         html += `
           <div class="team-box">
-            <div class="team-meta">
-              ${escapeHtml(team.sport)}
-            </div>
+            <div class="team-meta">${escapeHtml(team.sport)}</div>
 
-            <h3>${escapeHtml(title)}</h3>
+            <h3>${escapeHtml(team.teamName)}</h3>
             <p><strong>Jogadores cadastrados:</strong> ${(team.players || []).length}</p>
 
             <div class="team-actions">
