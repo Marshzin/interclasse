@@ -1829,6 +1829,7 @@ function renderMatches() {
           category: team.category || "",
           games: 0,
           wins: 0,
+          points: 0,
           goalsFor: 0,
           goalsAgainst: 0,
           yellow: 0,
@@ -1856,10 +1857,31 @@ function renderMatches() {
           if (teamStats[teamAName]) teamStats[teamAName].games += 1;
           if (teamStats[teamBName]) teamStats[teamBName].games += 1;
 
-          if (goalsA > goalsB && teamStats[teamAName]) {
-            teamStats[teamAName].wins += 1;
-          } else if (goalsB > goalsA && teamStats[teamBName]) {
-            teamStats[teamBName].wins += 1;
+          if (match.sport === "Futsal") {
+            if (goalsA > goalsB) {
+              if (teamStats[teamAName]) {
+                teamStats[teamAName].wins += 1;
+                teamStats[teamAName].points += 3;
+              }
+            } else if (goalsB > goalsA) {
+              if (teamStats[teamBName]) {
+                teamStats[teamBName].wins += 1;
+                teamStats[teamBName].points += 3;
+              }
+            } else {
+              if (teamStats[teamAName]) teamStats[teamAName].points += 1;
+              if (teamStats[teamBName]) teamStats[teamBName].points += 1;
+            }
+          }
+
+          if (match.sport === "Volei") {
+            if (goalsA > goalsB && teamStats[teamAName]) {
+              teamStats[teamAName].wins += 1;
+              teamStats[teamAName].points += 1;
+            } else if (goalsB > goalsA && teamStats[teamBName]) {
+              teamStats[teamBName].wins += 1;
+              teamStats[teamBName].points += 1;
+            }
           }
         }
 
@@ -1913,7 +1935,13 @@ function renderMatches() {
         scorers: Object.values(topScorers).sort((a, b) => b.total - a.total || a.playerName.localeCompare(b.playerName, "pt-BR")),
         yellow: Object.values(yellowCards).sort((a, b) => b.total - a.total || a.playerName.localeCompare(b.playerName, "pt-BR")),
         red: Object.values(redCards).sort((a, b) => b.total - a.total || a.playerName.localeCompare(b.playerName, "pt-BR")),
-        teams: Object.values(teamStats).sort((a, b) => b.wins - a.wins || b.goalsFor - a.goalsFor || a.teamName.localeCompare(b.teamName, "pt-BR"))
+        teams: Object.values(teamStats).sort((a, b) =>
+          b.points - a.points ||
+          b.wins - a.wins ||
+          (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst) ||
+          b.goalsFor - a.goalsFor ||
+          a.teamName.localeCompare(b.teamName, "pt-BR")
+        )
       };
     }
 
@@ -1942,6 +1970,8 @@ function renderMatches() {
       const teamA = getTeamByKey(match.teamAKey);
       const teamB = getTeamByKey(match.teamBKey);
       const events = Array.isArray(match.events) ? match.events : [];
+      const isVolei = match.sport === "Volei";
+      const competitionName = isVolei ? "Vôlei" : "Futsal";
 
       function countEvents(teamName, playerName, type) {
         return events.filter(event =>
@@ -1957,12 +1987,21 @@ function renderMatches() {
         if (!players.length) {
           return `
             <tr>
-              <td colspan="6" class="center">Nenhum jogador cadastrado.</td>
+              <td colspan="${isVolei ? "2" : "6"}" class="center">Nenhum jogador cadastrado.</td>
             </tr>
           `;
         }
 
         return players.map((player, index) => {
+          if (isVolei) {
+            return `
+              <tr>
+                <td class="center">${index + 1}</td>
+                <td>${escapeHtml(player.name || "")}</td>
+              </tr>
+            `;
+          }
+
           const yellow = player.name ? countEvents(teamName, player.name, "yellow") : 0;
           const red = player.name ? countEvents(teamName, player.name, "red") : 0;
           const foul = player.name ? countEvents(teamName, player.name, "foul") : 0;
@@ -1983,9 +2022,10 @@ function renderMatches() {
       function goalsTable(teamName) {
         const goals = events.filter(event => event.teamName === teamName && event.type === "goal");
         let html = "";
+        const label = isVolei ? "set" : "gol/ponto";
 
         if (!goals.length) {
-          return `<tr><td colspan="5" class="center">Nenhum gol/ponto registrado.</td></tr>`;
+          return `<tr><td colspan="5" class="center">Nenhum ${label} registrado.</td></tr>`;
         }
 
         const totalRows = Math.ceil(goals.length / 5);
@@ -1995,7 +2035,7 @@ function renderMatches() {
           for (let col = 0; col < 5; col++) {
             const index = row * 5 + col;
             const goal = goals[index];
-            html += `<td>${goal ? `<strong>${index + 1}-</strong> ${escapeHtml(goal.playerName || "")}` : ""}</td>`;
+            html += `<td>${goal ? `<strong>${index + 1}-</strong> ${escapeHtml(goal.playerName || (isVolei ? "Set" : ""))}` : ""}</td>`;
           }
           html += "</tr>";
         }
@@ -2008,6 +2048,26 @@ function renderMatches() {
       }
 
       function teamBlock(team, teamName) {
+        if (isVolei) {
+          return `
+            <table>
+              <tr>
+                <th colspan="2" class="left">Equipe - ${escapeHtml(teamName)}</th>
+              </tr>
+              <tr>
+                <th style="width:60px;">Nº</th>
+                <th>Jogadores</th>
+              </tr>
+              ${playersRows(team, teamName)}
+            </table>
+
+            <table>
+              <tr><th colspan="5">Sets - ${escapeHtml(teamName)}</th></tr>
+              ${goalsTable(teamName)}
+            </table>
+          `;
+        }
+
         return `
           <table>
             <tr>
@@ -2118,7 +2178,7 @@ function renderMatches() {
 
     <table>
       <tr>
-        <td colspan="4"><strong>Competição:</strong> ${match.sport === "Volei" ? "Vôlei" : "Futsal"}</td>
+        <td colspan="4"><strong>Competição:</strong> ${competitionName}</td>
         <td colspan="2"><strong>Jogo Nº:</strong> ${escapeHtml(match.id)}</td>
       </tr>
       <tr>
@@ -2127,9 +2187,9 @@ function renderMatches() {
         <td colspan="2" class="center"><strong>${escapeHtml(match.teamBName)}</strong></td>
       </tr>
       <tr>
-        <td colspan="2"><strong>Categoria:</strong> ${escapeHtml(getCategoryLabel(match.category) || match.sport)}</td>
-        <td><strong>Ginásio:</strong> Walter Paiva</td>
-        <td><strong>Cidade:</strong> Ribeirão Preto</td>
+        ${isVolei ? "" : `<td colspan="2"><strong>Categoria:</strong> ${escapeHtml(getCategoryLabel(match.category) || match.sport)}</td>`}
+        <td ${isVolei ? "colspan=\"2\"" : ""}><strong>Ginásio:</strong> Walter Paiva</td>
+        <td ${isVolei ? "colspan=\"2\"" : ""}><strong>Cidade:</strong> Ribeirão Preto</td>
         <td colspan="2"><strong>Data:</strong> ${formatDateBR(match.date)}</td>
       </tr>
     </table>
@@ -2199,6 +2259,7 @@ function renderSummary() {
                     <th>Modalidade</th>
                     <th>Jogos</th>
                     <th>Vitórias</th>
+                    <th>Pontos</th>
                     <th>GP</th>
                     <th>GC</th>
                     <th>Amarelos</th>
@@ -2217,13 +2278,14 @@ function renderSummary() {
                           </td>
                           <td>${team.games}</td>
                           <td>${team.wins}</td>
+                          <td>${team.points}</td>
                           <td>${team.goalsFor}</td>
                           <td>${team.goalsAgainst}</td>
                           <td>${team.yellow}</td>
                           <td>${team.red}</td>
                         </tr>
                       `).join("")
-                      : `<tr><td colspan="8">Nenhuma equipe cadastrada.</td></tr>`
+                      : `<tr><td colspan="9">Nenhuma equipe cadastrada.</td></tr>`
                   }
                 </tbody>
               </table>
