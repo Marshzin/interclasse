@@ -1742,31 +1742,144 @@
       });
 
     } else {
-      const sportMatches = matchesCache.filter(match => match.sport === sport);
+  const sportMatches = matchesCache.filter(match => match.sport === sport);
 
-      if (!sportMatches.length) {
-        html += `
-          <div class="empty-box">
-            Nenhum jogo cadastrado em ${escapeHtml(sport)}.
+  if (!sportMatches.length) {
+    html += `
+      <div class="empty-box">
+        Nenhum jogo cadastrado em ${escapeHtml(sport)}.
+      </div>
+    `;
+    return;
+  }
+
+  html += `<div class="matches-grid">`;
+
+  sportMatches.forEach(match => {
+    const panelId = `match-events-${match.id}`;
+    const managePanelId = `manage-panel-${match.id}`;
+    const isFinalized = match.status === "finalizado";
+
+    html += `
+      <div class="match-box">
+        <div class="match-meta">${escapeHtml(match.sport)}</div>
+
+        <div class="status-tag ${getStatusClass(match.status)}">
+          ${getStatusLabel(match.status)}
+        </div>
+
+        <h3>${escapeHtml(match.teamAName)} x ${escapeHtml(match.teamBName)}</h3>
+
+        <p><strong>Data:</strong> ${formatDateBR(match.date)}</p>
+        <p><strong>Horário:</strong> ${escapeHtml(match.time || "Não informado")}</p>
+
+        <div class="score-line">
+          <span class="score-team-name">${escapeHtml(match.teamAName)}</span>
+
+          <div class="score-center">
+            <span class="score-badge">${Number(match.goalsA) || 0}</span>
+            <span>X</span>
+            <span class="score-badge">${Number(match.goalsB) || 0}</span>
           </div>
-        `;
-        return;
-      }
 
-      html += `<div class="matches-grid">`;
+          <span class="score-team-name">${escapeHtml(match.teamBName)}</span>
+        </div>
 
-      sportMatches.forEach(match => {
-        html += `
-          <div class="match-box">
-            <div class="match-meta">${escapeHtml(match.sport)}</div>
-            <h3>${escapeHtml(match.teamAName)} x ${escapeHtml(match.teamBName)}</h3>
+        <div class="match-actions">
+          <button class="btn-custom btn-secondary-custom"
+            onclick="openMatchManagePanel('${match.id}', this)">
+            Gerenciar jogo
+          </button>
+
+          <button class="btn-custom players-btn"
+            data-open-label="Ocultar eventos"
+            data-closed-label="Eventos"
+            onclick="togglePlayers('${panelId}', this)">
+            Eventos
+          </button>
+
+          <button class="btn-custom btn-danger-custom"
+            onclick="deleteMatch('${match.id}')">
+            Excluir jogo
+          </button>
+        </div>
+
+        <div class="match-management-panel" id="${managePanelId}">
+          <div class="btn-row-custom">
+            <button class="btn-custom btn-secondary-custom"
+              onclick="setMatchStatus('${match.id}', 'nao_iniciado')">
+              Não iniciado
+            </button>
+
+            <button class="btn-custom btn-warning-custom"
+              onclick="setMatchStatus('${match.id}', 'andamento')">
+              Iniciar jogo
+            </button>
+
+            <button class="btn-custom players-btn"
+              onclick="setMatchStatus('${match.id}', 'intervalo')">
+              Intervalo
+            </button>
+
+            <button class="btn-custom btn-success-custom"
+              onclick="setMatchStatus('${match.id}', 'finalizado')">
+              Finalizar
+            </button>
           </div>
-        `;
-      });
 
-      html += `</div>`;
-    }
+          <div class="mini-form-grid">
+            <div class="form-group-custom">
+              <label class="form-label-custom">Participante</label>
+              <select class="form-select-custom"
+                id="event-team-${match.id}"
+                onchange="updatePlayerSelect('${match.id}')"
+                ${isFinalized ? "disabled" : ""}>
+                <option value="">Selecione</option>
+                <option value="${escapeHtml(match.teamAKey)}">${escapeHtml(match.teamAName)}</option>
+                <option value="${escapeHtml(match.teamBKey)}">${escapeHtml(match.teamBName)}</option>
+              </select>
+            </div>
+
+            <div class="form-group-custom">
+              <label class="form-label-custom">Jogador</label>
+              <select class="form-select-custom"
+                id="event-player-${match.id}"
+                ${isFinalized ? "disabled" : ""}>
+                <option value="">Selecione</option>
+              </select>
+            </div>
+
+            <div class="form-group-custom">
+              <label class="form-label-custom">Evento</label>
+              <select class="form-select-custom"
+                id="event-type-${match.id}"
+                ${isFinalized ? "disabled" : ""}>
+                <option value="">Selecione</option>
+                <option value="goal">Ponto</option>
+                <option value="yellow">Advertência</option>
+                <option value="red">Expulsão</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="btn-row-custom">
+            <button class="btn-custom btn-success-custom"
+              onclick="addEventToMatch('${match.id}')"
+              ${isFinalized ? "disabled" : ""}>
+              Adicionar evento
+            </button>
+          </div>
+        </div>
+
+        <div class="players-panel" id="${panelId}">
+          ${renderEvents(match.events || [])}
+        </div>
+      </div>
+    `;
   });
+
+  html += `</div>`;
+}
 
   matchesContainer.innerHTML = html;
 }
