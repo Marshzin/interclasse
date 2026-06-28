@@ -32,12 +32,6 @@
       font-size: 22px;
     }
 
-    .section-subtitle {
-      margin: 0 0 18px;
-      color: rgba(255,255,255,0.70);
-      line-height: 1.6;
-    }
-
     .modalities-nav {
       display: flex;
       gap: 12px;
@@ -183,10 +177,7 @@
         background: #151821 !important;
         transform: translateX(-110%) !important;
         transition: transform 0.3s ease !important;
-        will-change: transform;
         display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
       }
 
       .sidebar.mobile-open {
@@ -242,6 +233,7 @@
     }
   </style>
 </head>
+
 <body>
   <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" onclick="toggleMobileMenu()">
     <div class="hamburger">
@@ -265,50 +257,11 @@
       <nav class="nav-section">
         <div class="nav-label">Menu Principal</div>
 
-        <a href="index.html" class="nav-item">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-          </svg>
-          Início
-        </a>
-
-        <a href="jogos.html" class="nav-item">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-          </svg>
-          Jogos
-        </a>
-
-        <a href="classificacao.html" class="nav-item">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 3v18h18"></path>
-            <path d="M18 17V9"></path>
-            <path d="M13 17V5"></path>
-            <path d="M8 17v-3"></path>
-          </svg>
-          Classificação
-        </a>
-
-        <a href="times.html" class="nav-item custom-active-link">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-          Times
-        </a>
-
-        <a href="administracao.html" class="nav-item">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 20h9"></path>
-            <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-          </svg>
-          Administração
-        </a>
+        <a href="index.html" class="nav-item">Início</a>
+        <a href="jogos.html" class="nav-item">Jogos</a>
+        <a href="classificacao.html" class="nav-item">Classificação</a>
+        <a href="times.html" class="nav-item custom-active-link">Times</a>
+        <a href="administracao.html" class="nav-item">Administração</a>
       </nav>
     </aside>
 
@@ -322,9 +275,9 @@
         <h2 class="section-title">Modalidades</h2>
 
         <div class="modalities-nav">
-          <a href="#mod-futsal" class="modality-btn">Futsal</a>
-          <a href="#mod-volei" class="modality-btn">Volei</a>
-          <a href="#mod-pingpong" class="modality-btn">Pingpong</a>
+          <a href="#mod-futsal-ensino-medio" class="modality-btn">Futsal - Ensino Médio</a>
+          <a href="#mod-futsal-ensino-fundamental" class="modality-btn">Futsal - Ensino Fundamental</a>
+          <a href="#mod-volei" class="modality-btn">Vôlei</a>
         </div>
 
         <div id="teamsContainer"></div>
@@ -333,11 +286,25 @@
   </div>
 
   <script src="js/templatemo-crypto-script.js"></script>
+
   <script type="module">
     import { listenTeams } from "./firebase.js";
 
-    const FIXED_SPORTS = ["Futsal", "Volei", "Pingpong"];
+    const FIXED_SPORTS = [
+      "Futsal - Ensino Medio",
+      "Futsal - Ensino Fundamental",
+      "Volei"
+    ];
+
     const teamsContainer = document.getElementById("teamsContainer");
+
+    function normalizeText(text) {
+      return String(text || "")
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
 
     function escapeHtml(text) {
       return String(text ?? "")
@@ -349,19 +316,60 @@
     }
 
     function createSafeId(text) {
-      return "mod-" + text
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
+      return "mod-" + normalizeText(text)
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
     }
 
+    function getSectionLabel(section) {
+      if (section === "Futsal - Ensino Medio") return "Futsal - Ensino Médio";
+      if (section === "Futsal - Ensino Fundamental") return "Futsal - Ensino Fundamental";
+      if (section === "Volei") return "Vôlei";
+      return section;
+    }
+
+    function getTeamsBySection(teams, section) {
+      const sectionNormalized = normalizeText(section);
+
+      return teams.filter(team => {
+        const sport = normalizeText(team.sport);
+        const category = normalizeText(team.category);
+
+        if (sectionNormalized === "futsal - ensino medio") {
+          return (
+            sport === "futsal - ensino medio" ||
+            sport === "futsal ensino medio" ||
+            sport === "futsal medio" ||
+            sport === "futsal - medio" ||
+            (sport === "futsal" && (
+              category === "ensino medio" ||
+              category === "medio"
+            ))
+          );
+        }
+
+        if (sectionNormalized === "futsal - ensino fundamental") {
+          return (
+            sport === "futsal - ensino fundamental" ||
+            sport === "futsal ensino fundamental" ||
+            sport === "futsal fundamental" ||
+            sport === "futsal - fundamental" ||
+            (sport === "futsal" && (
+              category === "ensino fundamental" ||
+              category === "fundamental"
+            ))
+          );
+        }
+
+        if (sectionNormalized === "volei") {
+          return sport === "volei";
+        }
+
+        return sport === sectionNormalized;
+      });
+    }
+
     function buildDisplayName(team) {
-      if (team.sport === "Pingpong") {
-        const first = team.players && team.players[0] ? team.players[0] : null;
-        return first ? first.name : "Jogador";
-      }
       return team.teamName || "Equipe";
     }
 
@@ -372,9 +380,10 @@
       panel.classList.toggle("show");
       button.textContent = panel.classList.contains("show") ? "Ocultar jogadores" : "Jogadores";
     }
+
     window.togglePlayers = togglePlayers;
 
-    function renderPlayersList(players, sport) {
+    function renderPlayersList(players) {
       if (!players || !players.length) {
         return "<p>Nenhum jogador informado.</p>";
       }
@@ -382,9 +391,10 @@
       return `
         <ul>
           ${players.map(player => {
-            if (sport === "Futsal" && player.number) {
+            if (player.number) {
               return `<li>${escapeHtml(player.number)} - ${escapeHtml(player.name)}</li>`;
             }
+
             return `<li>${escapeHtml(player.name)}</li>`;
           }).join("")}
         </ul>
@@ -394,33 +404,37 @@
     function renderTeams(teams) {
       let html = "";
 
-      FIXED_SPORTS.forEach(sport => {
-        const sportId = createSafeId(sport);
-        const sportTeams = teams.filter(team => team.sport === sport);
+      FIXED_SPORTS.forEach(section => {
+        const sectionId = createSafeId(section);
+        const sectionLabel = getSectionLabel(section);
+        const sectionTeams = getTeamsBySection(teams || [], section);
 
         html += `
-          <div class="teams-group" id="${sportId}">
-            <h2 class="teams-group-title">${escapeHtml(sport)}</h2>
+          <div class="teams-group" id="${sectionId}">
+            <h2 class="teams-group-title">${escapeHtml(sectionLabel)}</h2>
         `;
 
-        if (!sportTeams.length) {
-          html += `<div class="empty-box">Nenhuma equipe cadastrada em ${escapeHtml(sport)}.</div>`;
+        if (!sectionTeams.length) {
+          html += `<div class="empty-box">Nenhuma equipe cadastrada em ${escapeHtml(sectionLabel)}.</div>`;
         } else {
           html += `<div class="teams-grid">`;
 
-          sportTeams.forEach((team, index) => {
-            const playersId = `players-panel-${sport}-${index}-${team.id}`;
+          sectionTeams.forEach((team, index) => {
+            const playersId = `players-panel-${sectionId}-${index}-${team.id || index}`;
             const title = buildDisplayName(team);
 
             html += `
               <div class="team-box">
-                <div class="team-meta">${escapeHtml(team.sport)}</div>
+                <div class="team-meta">${escapeHtml(sectionLabel)}</div>
+
                 <h3>${escapeHtml(title)}</h3>
 
-                ${team.sport === "Futsal" ? `<p><strong>Capitão:</strong> ${escapeHtml(team.captain || "-")}</p>` : ""}
-                ${team.sport === "Volei" ? `<p><strong>Equipe de Volei</strong></p>` : ""}
-                ${team.sport === "Pingpong" ? `<p><strong>Participante individual</strong></p>` : ""}
-                ${team.sport !== "Pingpong" ? `<p><strong>Jogadores cadastrados:</strong> ${team.players ? team.players.length : 0}</p>` : ""}
+                ${normalizeText(section) !== "volei"
+                  ? `<p><strong>Capitão:</strong> ${escapeHtml(team.captain || "-")}</p>`
+                  : `<p><strong>Equipe de Vôlei</strong></p>`
+                }
+
+                <p><strong>Jogadores cadastrados:</strong> ${team.players ? team.players.length : 0}</p>
                 <p><strong>Pontos:</strong> ${Number(team.points || 0)}</p>
 
                 <div class="team-actions">
@@ -428,7 +442,7 @@
                 </div>
 
                 <div class="players-panel" id="${playersId}">
-                  ${renderPlayersList(team.players || [], team.sport)}
+                  ${renderPlayersList(team.players || [])}
                 </div>
               </div>
             `;
@@ -444,7 +458,7 @@
     }
 
     listenTeams((teams) => {
-      renderTeams(teams);
+      renderTeams(teams || []);
     });
   </script>
 
